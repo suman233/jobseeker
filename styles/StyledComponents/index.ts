@@ -1,0 +1,2 @@
+// Styled components exports
+export {};

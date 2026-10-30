@@ -1,0 +1,2 @@
+// MUI Theme Types
+export {};

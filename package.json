@@ -1,0 +1,38 @@
+{
+  "name": "worksphere-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.3.1",
+    "@mui/material": "^9.3.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/js-cookie": "^3.0.6",
+    "framer-motion": "^13.1.1",
+    "js-cookie": "^3.0.8",
+    "lucide-react": "^1.33.0",
+    "next": "16.3.2",
+    "postcss": "^8.5.26",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.91.0",
+    "sass": "^1.103.1",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.2",
+    "typescript": "^5"
+  }
+}
