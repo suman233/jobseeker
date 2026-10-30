@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { registerUserApi } from "@/api/functions/user.api";
+import {
+  registerUserApi,
+  sendEmailOtpApi,
+  verifyEmailOtpApi,
+} from "@/api/functions/user.api";
 import {
   Eye,
   EyeOff,
@@ -12,6 +16,9 @@ import {
   CheckCircle2,
   UserPlus,
   Briefcase,
+  MailCheck,
+  ShieldCheck,
+  X,
 } from "lucide-react";
 
 interface RegisterFormData {
@@ -27,9 +34,19 @@ export default function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  // Email verification state
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [verifiedEmailValue, setVerifiedEmailValue] = useState("");
+  const [showInlineOtp, setShowInlineOtp] = useState(false);
+  const [emailOtp, setEmailOtp] = useState("");
+  const [sendingEmailOtp, setSendingEmailOtp] = useState(false);
+  const [verifyingEmailOtp, setVerifyingEmailOtp] = useState(false);
+  const [emailOtpCooldown, setEmailOtpCooldown] = useState(0);
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormData>({
     defaultValues: {
@@ -39,7 +56,110 @@ export default function RegisterPage() {
     },
   });
 
+  const emailWatch = watch("email") || "";
+
+  useEffect(() => {
+    if (emailOtpCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setEmailOtpCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [emailOtpCooldown]);
+
+  const handleSendEmailVerification = async () => {
+    const cleanEmail = emailWatch.trim().toLowerCase();
+    const emailRegex = /^\S+@\S+\.\S+$/;
+
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      setErrorMsg("Please enter a valid email address first.");
+      return;
+    }
+
+    setErrorMsg("");
+    setSuccessMsg("");
+    setSendingEmailOtp(true);
+
+    try {
+      const res = await sendEmailOtpApi({ email: cleanEmail });
+      if (res.status) {
+        setShowInlineOtp(true);
+        setEmailOtpCooldown(60);
+        setSuccessMsg(
+          res.message || "A 6-digit verification code has been sent to your email!"
+        );
+      } else {
+        setErrorMsg(res.message || "Failed to send verification code.");
+      }
+    } catch (err: unknown) {
+      const apiErr = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setErrorMsg(
+        apiErr.response?.data?.message ||
+          apiErr.message ||
+          "Could not send verification code."
+      );
+    } finally {
+      setSendingEmailOtp(false);
+    }
+  };
+
+  const handleConfirmEmailOtp = async () => {
+    const cleanEmail = emailWatch.trim().toLowerCase();
+    const cleanOtp = emailOtp.trim();
+
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      setErrorMsg("Please enter the complete 6-digit verification code.");
+      return;
+    }
+
+    setErrorMsg("");
+    setSuccessMsg("");
+    setVerifyingEmailOtp(true);
+
+    try {
+      const res = await verifyEmailOtpApi({
+        email: cleanEmail,
+        otp: cleanOtp,
+      });
+
+      if (res.status) {
+        setIsEmailVerified(true);
+        setVerifiedEmailValue(cleanEmail);
+        setShowInlineOtp(false);
+        setEmailOtp("");
+        setSuccessMsg(
+          "Email verified successfully! Please enter your name and password to complete registration."
+        );
+      } else {
+        setErrorMsg(res.message || "Invalid or expired verification code.");
+      }
+    } catch (err: unknown) {
+      const apiErr = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setErrorMsg(
+        apiErr.response?.data?.message ||
+          apiErr.message ||
+          "Failed to verify code."
+      );
+    } finally {
+      setVerifyingEmailOtp(false);
+    }
+  };
+
   const onSubmit = async (data: RegisterFormData) => {
+    const cleanEmail = data.email.trim().toLowerCase();
+
+    if (!isEmailVerified || verifiedEmailValue !== cleanEmail) {
+      setErrorMsg(
+        "Please click 'Verify' next to your email address before creating an account."
+      );
+      return;
+    }
+
     setErrorMsg("");
     setSuccessMsg("");
     setLoading(true);
@@ -47,18 +167,18 @@ export default function RegisterPage() {
     try {
       const res = await registerUserApi({
         name: data.name.trim(),
-        email: data.email.trim(),
+        email: cleanEmail,
         password: data.password,
         role: "jobSeeker",
       });
 
       if (res.status) {
         setSuccessMsg(
-          res.message || "Registration successful! A verification code has been sent."
+          "Account created successfully! Redirecting you to sign in..."
         );
         setTimeout(() => {
-          router.push(`/auth/otp?email=${encodeURIComponent(data.email.trim())}`);
-        }, 1000);
+          router.push("/auth/login");
+        }, 1200);
       } else {
         setErrorMsg(res.message || "Registration failed.");
       }
@@ -94,7 +214,7 @@ export default function RegisterPage() {
           Create Candidate Profile
         </h2>
         <p className="text-xs text-gray-500 mb-6">
-          Join vetted high-growth technology talent with direct hiring access.
+          Verify your email to create an authenticated high-growth talent profile.
         </p>
 
         {errorMsg && (
@@ -111,6 +231,145 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Email Address with Verify Button */}
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-xs font-bold text-gray-700 mb-1"
+            >
+              Email Address
+            </label>
+            <div className="relative flex items-center">
+              <input
+                id="email"
+                type="email"
+                readOnly={isEmailVerified}
+                placeholder="candidate@worksphere.com"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+\.\S+$/,
+                    message: "Please enter a valid email",
+                  },
+                  onChange: () => {
+                    if (isEmailVerified) {
+                      setIsEmailVerified(false);
+                      setVerifiedEmailValue("");
+                    }
+                  },
+                })}
+                className={`w-full pl-3.5 pr-24 py-2.5 rounded-xl border text-xs transition-colors ${
+                  isEmailVerified
+                    ? "bg-emerald-50/60 border-emerald-300 text-emerald-900 font-medium"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:outline-none focus:border-indigo-600 focus:bg-white"
+                }`}
+              />
+
+              <div className="absolute right-1.5 flex items-center">
+                {isEmailVerified ? (
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-bold">
+                    <CheckCircle2 size={13} className="text-emerald-700" />
+                    <span>Verified</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEmailVerified(false);
+                        setVerifiedEmailValue("");
+                      }}
+                      className="ml-1 text-[10px] text-emerald-600 underline hover:text-emerald-900 cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendEmailVerification}
+                    disabled={
+                      sendingEmailOtp ||
+                      !emailWatch ||
+                      !/^\S+@\S+\.\S+$/.test(emailWatch) ||
+                      emailOtpCooldown > 0
+                    }
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+                  >
+                    {sendingEmailOtp ? (
+                      <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      <MailCheck size={13} />
+                    )}
+                    <span>
+                      {emailOtpCooldown > 0 ? `${emailOtpCooldown}s` : "Verify"}
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+            {errors.email && (
+              <p className="mt-1 text-[11px] text-red-600">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Inline OTP Verification Card */}
+          {showInlineOtp && !isEmailVerified && (
+            <div className="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200 space-y-2.5 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between text-xs text-indigo-950 font-medium">
+                <span className="flex items-center gap-1.5 font-bold">
+                  <ShieldCheck size={14} className="text-indigo-600" />
+                  Enter 6-Digit Email Code
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowInlineOtp(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-600">
+                Code sent to <strong className="text-indigo-900">{emailWatch}</strong>
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={emailOtp}
+                  onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ""))}
+                  placeholder="123456"
+                  className="flex-1 px-3 py-2 text-center tracking-[6px] font-mono font-bold text-base rounded-lg bg-white border border-indigo-300 text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-600"
+                />
+                <button
+                  type="button"
+                  onClick={handleConfirmEmailOtp}
+                  disabled={verifyingEmailOtp || emailOtp.length !== 6}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-2xs transition-all cursor-pointer"
+                >
+                  {verifyingEmailOtp ? (
+                    <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    "Confirm"
+                  )}
+                </button>
+              </div>
+              <div className="flex items-center justify-between text-[11px] pt-1">
+                <span className="text-gray-500">Didn&apos;t receive it?</span>
+                <button
+                  type="button"
+                  onClick={handleSendEmailVerification}
+                  disabled={emailOtpCooldown > 0 || sendingEmailOtp}
+                  className="text-indigo-600 hover:underline font-bold disabled:text-gray-400 disabled:no-underline cursor-pointer"
+                >
+                  {emailOtpCooldown > 0
+                    ? `Resend in ${emailOtpCooldown}s`
+                    : "Resend Code"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Full Name */}
           <div>
             <label
               htmlFor="name"
@@ -138,33 +397,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-xs font-bold text-gray-700 mb-1"
-            >
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="name@example.com"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^\S+@\S+\.\S+$/,
-                  message: "Please enter a valid email",
-                },
-              })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
-            />
-            {errors.email && (
-              <p className="mt-1 text-[11px] text-red-600">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
+          {/* Password */}
           <div>
             <label
               htmlFor="password"
@@ -211,12 +444,12 @@ export default function RegisterPage() {
             {loading ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Creating Profile...</span>
+                <span>Creating Verified Profile...</span>
               </>
             ) : (
               <>
                 <UserPlus size={15} />
-                <span>Create Account & Verify OTP</span>
+                <span>Create Verified Account</span>
               </>
             )}
           </button>

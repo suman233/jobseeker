@@ -6,6 +6,8 @@ export const ENDPOINTS = {
     profile: "/api/user-profile",
     verifyOtp: "/api/verify-otp",
     resendOtp: "/api/resend-otp",
+    sendEmailOtp: "/api/send-email-otp",
+    verifyEmailOtp: "/api/verify-email-otp",
   },
   jobs: {
     list: "/api/jobs",

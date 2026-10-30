@@ -73,6 +73,20 @@ export const resendOtpApi = async (
   return axiosInstance.post<UserResponse>(ENDPOINTS.auth.resendOtp, payload);
 };
 
+// Send OTP to email for pre-registration verification
+export const sendEmailOtpApi = async (
+  payload: { email: string }
+): Promise<UserResponse> => {
+  return axiosInstance.post<UserResponse>(ENDPOINTS.auth.sendEmailOtp, payload);
+};
+
+// Verify pre-registration email OTP
+export const verifyEmailOtpApi = async (
+  payload: { email: string; otp: string }
+): Promise<UserResponse> => {
+  return axiosInstance.post<UserResponse>(ENDPOINTS.auth.verifyEmailOtp, payload);
+};
+
 // Get current profile using bearer token
 export const fetchUserProfileApi = async (
   token: string
