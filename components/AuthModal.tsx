@@ -10,6 +10,17 @@ import {
   UserProfile,
 } from "@/api/functions/user.api";
 import { useAuthStore } from "@/zustand/auth.zustand";
+import {
+  Eye,
+  EyeOff,
+  X,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  ShieldCheck,
+  LogIn,
+  UserPlus,
+} from "lucide-react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -45,7 +56,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     handleSubmit,
     reset,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<AuthFormInputs>({
     defaultValues: {
@@ -128,7 +138,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setErrorMsg(res.message || "Login failed.");
         }
       } else if (mode === "otp") {
-        // OTP verification step
         const emailToVerify = otpEmail || data.email.trim();
         const res = await verifyOtpApi({
           email: emailToVerify,
@@ -148,27 +157,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     } catch (err: unknown) {
       const apiErr = err as {
-        response?: {
-          data?: { requireOtp?: boolean; email?: string; message?: string };
-        };
+        response?: { data?: { message?: string } };
         message?: string;
       };
-
-      if (apiErr.response?.data?.requireOtp) {
-        setOtpEmail(apiErr.response.data.email || data.email.trim());
-        setMode("otp");
-        setResendCooldown(60);
-        setErrorMsg(
-          apiErr.response.data.message ||
-            "Please verify your email with the 6-digit OTP code sent to your email."
-        );
-        return;
-      }
-
       setErrorMsg(
         apiErr.response?.data?.message ||
           apiErr.message ||
-          "Failed to connect to backend server."
+          "Authentication request failed. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -176,28 +171,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleResendOtp = async () => {
-    if (!otpEmail || resendCooldown > 0 || resending) return;
-    setErrorMsg("");
+    if (resendCooldown > 0 || resending) return;
     setResending(true);
-
+    setErrorMsg("");
     try {
       const res = await resendOtpApi({ email: otpEmail });
       if (res.status) {
-        setSuccessMsg("A new verification code has been sent!");
+        setSuccessMsg(res.message || "New OTP sent to your email!");
         setResendCooldown(60);
       } else {
-        setErrorMsg(res.message || "Failed to resend verification code.");
+        setErrorMsg(res.message || "Failed to resend OTP.");
       }
     } catch (err: unknown) {
       const apiErr = err as {
         response?: { data?: { message?: string } };
         message?: string;
       };
-      setErrorMsg(
-        apiErr.response?.data?.message ||
-          apiErr.message ||
-          "Failed to resend code."
-      );
+      setErrorMsg(apiErr.response?.data?.message || "Failed to resend code.");
     } finally {
       setResending(false);
     }
@@ -207,84 +197,101 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-inverse-surface/60 backdrop-blur-sm transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
     >
-      <div className="bg-surface-container-lowest rounded-2xl max-w-md w-full p-space-lg shadow-2xl relative border border-surface-container animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-space-md border-b border-surface-container">
-          <div className="flex items-center gap-space-sm">
-            <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[20px]">
-                {mode === "otp"
-                  ? "mark_email_read"
-                  : mode === "register"
-                  ? "person_add"
-                  : "person"}
-              </span>
-            </div>
-            <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface font-semibold">
-                {mode === "otp"
-                  ? "Email Verification"
-                  : mode === "register"
-                  ? "Create Candidate Profile"
-                  : "Candidate Sign In"}
-              </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                {mode === "otp"
-                  ? "Enter the 6-digit code sent to your email"
-                  : mode === "register"
-                  ? "Join WorkSphere to apply for roles"
-                  : "Sign in to manage your applications"}
-              </p>
-            </div>
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
+        {/* Top Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">
+              {mode === "login"
+                ? "Sign in to WorkSphere"
+                : mode === "register"
+                ? "Create Candidate Profile"
+                : "Verify Email Address"}
+            </h3>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {mode === "login"
+                ? "Access vetted tech roles and manage your applications."
+                : mode === "register"
+                ? "Join top tech talent with verified compensation insight."
+                : `Enter the 6-digit code sent to ${otpEmail}`}
+            </p>
           </div>
           <button
             type="button"
+            aria-label="Close modal"
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <X size={18} />
           </button>
         </div>
 
-        {/* Alerts */}
+        {/* Mode Selector Tabs (Login vs Register) */}
+        {mode !== "otp" && (
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl mt-4">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setErrorMsg("");
+                setSuccessMsg("");
+              }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                mode === "login"
+                  ? "bg-white text-gray-900 shadow-2xs"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <LogIn size={14} />
+              <span>Sign In</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("register");
+                setErrorMsg("");
+                setSuccessMsg("");
+              }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                mode === "register"
+                  ? "bg-white text-gray-900 shadow-2xs"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <UserPlus size={14} />
+              <span>Create Account</span>
+            </button>
+          </div>
+        )}
+
+        {/* Notifications / Alerts */}
         {errorMsg && (
-          <div className="mt-space-md p-space-sm rounded-lg bg-error-container text-on-error-container text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">error</span>
+          <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+            <AlertCircle size={16} className="shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
         {successMsg && (
-          <div className="mt-space-md p-space-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">
-              check_circle
-            </span>
+          <div className="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+            <CheckCircle2 size={16} className="shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
 
-        {/* Form */}
+        {/* Form Body */}
         <form
           onSubmit={handleSubmit(handleAuthSubmit)}
-          className="mt-space-md space-y-space-md"
+          className="mt-4 space-y-3.5"
         >
           {/* OTP Mode */}
           {mode === "otp" ? (
-            <div className="space-y-space-md">
-              <div className="text-center py-2">
-                <p className="text-body-sm text-on-surface-variant">
-                  Verification code sent to{" "}
-                  <strong className="text-on-surface font-semibold">
-                    {otpEmail}
-                  </strong>
-                </p>
-              </div>
-
+            <div className="space-y-4">
               <div>
                 <label
                   htmlFor="modal-otp"
-                  className="block font-label-md text-label-md text-on-surface font-medium mb-1.5"
+                  className="block text-xs font-bold text-gray-700 mb-1"
                 >
                   6-Digit OTP Code
                 </label>
@@ -301,10 +308,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       message: "Please enter a 6-digit code",
                     },
                   })}
-                  className="w-full px-space-md py-3 text-center tracking-[8px] text-2xl font-bold font-mono rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:tracking-normal placeholder:font-sans placeholder:text-base placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest"
+                  className="w-full px-4 py-2.5 text-center tracking-[10px] text-2xl font-bold font-mono rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:tracking-normal placeholder:font-sans placeholder:text-sm placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white transition-colors"
                 />
                 {errors.otp && (
-                  <p className="mt-1 text-label-sm text-error">
+                  <p className="mt-1 text-[11px] text-red-600">
                     {errors.otp.message}
                   </p>
                 )}
@@ -313,24 +320,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="submit"
                 disabled={loading || otpWatch.length !== 6}
-                className="w-full py-2.5 px-space-md rounded-xl bg-primary text-on-primary font-headline-sm text-body-md font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     <span>Verifying...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px]">
-                      verified
-                    </span>
+                    <ShieldCheck size={16} />
                     <span>Verify Code</span>
                   </>
                 )}
               </button>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center justify-between pt-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -338,19 +343,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     setErrorMsg("");
                     setSuccessMsg("");
                   }}
-                  className="text-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-flex items-center gap-1"
+                  className="text-xs text-gray-500 hover:text-gray-800 transition-colors inline-flex items-center gap-1 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[16px]">
-                    arrow_back
-                  </span>
-                  <span>Back</span>
+                  <ArrowLeft size={14} />
+                  <span>Back to Sign In</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleResendOtp}
                   disabled={resendCooldown > 0 || resending}
-                  className="text-body-sm text-primary hover:underline font-semibold disabled:text-on-surface-variant disabled:no-underline disabled:cursor-not-allowed"
+                  className="text-xs text-indigo-600 hover:underline font-semibold disabled:text-gray-400 disabled:no-underline disabled:cursor-not-allowed cursor-pointer"
                 >
                   {resending
                     ? "Sending..."
@@ -367,7 +370,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div>
                   <label
                     htmlFor="modal-name"
-                    className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+                    className="block text-xs font-bold text-gray-700 mb-1"
                   >
                     Full Name
                   </label>
@@ -383,10 +386,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         message: "Name must be at least 3 characters",
                       },
                     })}
-                    className="w-full px-space-md py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+                    className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
                   />
                   {errors.name && (
-                    <p className="mt-1 text-label-sm text-error">
+                    <p className="mt-1 text-[11px] text-red-600">
                       {errors.name.message}
                     </p>
                   )}
@@ -396,7 +399,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div>
                 <label
                   htmlFor="modal-email"
-                  className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+                  className="block text-xs font-bold text-gray-700 mb-1"
                 >
                   Email Address
                 </label>
@@ -411,10 +414,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       message: "Please enter a valid email",
                     },
                   })}
-                  className="w-full px-space-md py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+                  className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-label-sm text-error">
+                  <p className="mt-1 text-[11px] text-red-600">
                     {errors.email.message}
                   </p>
                 )}
@@ -423,7 +426,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div>
                 <label
                   htmlFor="modal-password"
-                  className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+                  className="block text-xs font-bold text-gray-700 mb-1"
                 >
                   Password
                 </label>
@@ -443,8 +446,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         message: "Password must be at least 6 characters",
                       },
                     })}
-                    className="w-full pl-space-md pr-11 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+                    className="w-full pl-3.5 pr-10 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
                   />
+                  {/* Eye / EyeOff Password Visibility Toggle */}
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
@@ -452,15 +456,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer p-0.5"
                   >
-                    <span className="material-symbols-outlined text-[20px] select-none">
-                      {showPassword ? "visibility_off" : "visibility"}
-                    </span>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-label-sm text-error">
+                  <p className="mt-1 text-[11px] text-red-600">
                     {errors.password.message}
                   </p>
                 )}
@@ -469,60 +471,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 px-space-md rounded-xl bg-primary text-on-primary font-headline-sm text-body-md font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                className="w-full mt-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     <span>Processing...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px]">
-                      {mode === "register" ? "person_add" : "login"}
-                    </span>
-                    <span>
-                      {mode === "register"
-                        ? "Register & Send OTP"
-                        : "Sign In"}
-                    </span>
+                    {mode === "login" ? (
+                      <>
+                        <LogIn size={15} />
+                        <span>Sign In</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus size={15} />
+                        <span>Create Account & Get OTP</span>
+                      </>
+                    )}
                   </>
                 )}
               </button>
-
-              <div className="pt-space-sm border-t border-surface-container text-center">
-                {mode === "login" ? (
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Don&apos;t have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("register");
-                        setErrorMsg("");
-                        setSuccessMsg("");
-                      }}
-                      className="text-primary hover:underline font-semibold"
-                    >
-                      Sign Up
-                    </button>
-                  </p>
-                ) : (
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMode("login");
-                        setErrorMsg("");
-                        setSuccessMsg("");
-                      }}
-                      className="text-primary hover:underline font-semibold"
-                    >
-                      Sign In
-                    </button>
-                  </p>
-                )}
-              </div>
             </>
           )}
         </form>

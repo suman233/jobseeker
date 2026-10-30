@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { JobItem } from "@/typescript/interface/job.interface";
+import { Zap, X, CheckCircle2 } from "lucide-react";
 
 interface ApplyModalProps {
   job: JobItem | null;
@@ -41,20 +42,20 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-inverse-surface/60 backdrop-blur-sm transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm"
     >
-      <div className="bg-surface-container-lowest rounded-xl max-w-lg w-full p-space-lg shadow-2xl relative border border-surface-container animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between pb-space-md border-b-0">
-          <div className="flex items-center gap-space-sm">
-            <div className="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
-              <span className="material-symbols-outlined text-[18px]">bolt</span>
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <Zap size={18} className="fill-current" />
             </div>
             <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface font-semibold">
+              <h3 className="text-base font-bold text-gray-900">
                 1-Click Fast Apply
               </h3>
-              <p className="font-body-sm text-body-sm text-on-surface-variant" id="modalRoleSubtitle">
+              <p className="text-xs text-gray-500" id="modalRoleSubtitle">
                 {job.company} • {job.title}
               </p>
             </div>
@@ -63,93 +64,73 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
             type="button"
             aria-label="Close modal"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-outline transition-colors"
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <X size={18} />
           </button>
         </div>
 
         {isSuccess ? (
-          <div className="py-space-xl text-center space-y-space-sm">
-            <div className="w-16 h-16 mx-auto rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
-              <span className="material-symbols-outlined text-[32px]">check</span>
+          <div className="py-8 text-center space-y-3">
+            <div className="w-14 h-14 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <CheckCircle2 size={32} />
             </div>
-            <h4 className="font-headline-md text-on-surface font-semibold">
+            <h4 className="text-base font-bold text-gray-900">
               Application Submitted!
             </h4>
-            <p className="font-body-sm text-on-surface-variant">
-              Your profile and credentials were successfully transmitted to {job.hiringManager.name}.
+            <p className="text-xs text-gray-500 max-w-xs mx-auto">
+              Your verified profile and credentials have been delivered directly to{" "}
+              <strong>{job.hiringManager.name}</strong>.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-space-md my-space-lg">
-              {/* Verified Resume Card */}
-              <div className="bg-surface-container-low p-space-md rounded-xl flex items-center justify-between border border-surface-container">
-                <div className="flex items-center gap-space-sm">
-                  <span className="material-symbols-outlined text-primary text-[28px]">
-                    description
-                  </span>
-                  <div>
-                    <p className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                      Alex_Morgan_Resume_2025.pdf
-                    </p>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant">
-                      Verified by WorkSphere • Updated 3 days ago
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="text-primary font-label-sm text-label-sm font-semibold hover:underline"
-                >
-                  Change
-                </button>
-              </div>
-
-              {/* Hiring Manager Note */}
-              <div>
-                <label className="block font-label-sm text-label-sm text-on-surface-variant uppercase font-semibold mb-1">
-                  Quick Note to {job.hiringManager.name} ({job.hiringManager.title.split("•")[0].trim()})
-                </label>
-                <textarea
-                  rows={3}
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Introduce yourself or highlight specific design systems or infrastructure projects you led..."
-                  className="w-full bg-surface-container-low rounded-lg p-space-sm font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:bg-surface-container transition-all border border-surface-container"
-                />
-              </div>
-
-              {/* Security & Discretion Badge */}
-              <div className="flex items-center gap-space-sm bg-secondary-fixed/50 p-space-sm rounded-lg border border-secondary-fixed">
-                <span className="material-symbols-outlined text-secondary text-[20px]">
-                  lock
-                </span>
-                <p className="font-body-sm text-body-sm text-on-secondary-fixed font-medium">
-                  Your contact details and discretion flags remain fully protected.
-                </p>
-              </div>
+          <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+            <div className="p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between text-xs text-gray-700">
+              <span className="font-medium">Verified Profile Delivery</span>
+              <span className="font-bold text-emerald-700">Instant</span>
             </div>
 
-            {/* Modal Actions */}
-            <div className="flex items-center justify-end gap-space-sm pt-space-sm border-t border-surface-container">
+            <div>
+              <label
+                htmlFor="applyNote"
+                className="block text-xs font-bold text-gray-700 mb-1"
+              >
+                Direct Note to Hiring Manager (Optional)
+              </label>
+              <textarea
+                id="applyNote"
+                rows={3}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Share a concise highlights overview relevant to this team..."
+                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs resize-none transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-space-md py-2 rounded-lg bg-surface-container text-on-surface font-headline-sm text-headline-sm hover:bg-surface-container-high transition-colors"
+                className="flex-1 py-2.5 px-4 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-space-xl py-2 bg-primary-container text-on-primary rounded-lg font-headline-sm text-headline-sm flex items-center gap-space-xs hover:bg-primary transition-all font-semibold disabled:opacity-50"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[18px]">
-                  send
-                </span>
-                <span>{isSubmitting ? "Submitting..." : "Submit Application"}</span>
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap size={14} className="fill-current" />
+                    <span>Submit Application</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -160,4 +141,3 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({
 };
 
 export default ApplyModal;
-

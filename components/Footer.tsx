@@ -2,121 +2,112 @@
 
 import React from "react";
 import Link from "next/link";
+import { Briefcase } from "lucide-react";
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.03)] mt-auto border-t border-surface-container">
-      <div className="max-w-[1280px] mx-auto px-gutter py-space-xl">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-space-xl mb-space-xl">
+    <footer className="w-full bg-white border-t border-gray-200/80 mt-auto">
+      <div className="max-w-[1280px] mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Intro & System Status */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-space-sm mb-space-md">
-              <img
-                alt="WorkSphere Logo"
-                className="h-6 w-auto object-contain"
-                src="https://lh3.googleusercontent.com/aida/AEtjO1Uvn_q5sMy6ZFlruW4qTx3MUU0DgKXJb3-GrOKP1u92HxxUoXSF6FcKU9LwEVAX0plxGfq90R6IEmEaTYZT8o5tjIMlNwQqRZRzp9w526wNddubsHU3y2csTc7vuG1Rj74eJG_dYbXU3gavTSYDmdDpqABqX4GonMoZ15AuLk3nT-WjEDKGzhArW0lPSVD0SlaSAtVSgEbnbaEAEQCJJrnmwGTMw9y_LY1qLwGNDoo"
-              />
-              <span className="font-headline-sm text-headline-sm text-on-surface font-bold">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center text-white">
+                <Briefcase size={14} className="stroke-[2.5]" />
+              </div>
+              <span className="text-base font-bold text-gray-900">
                 WorkSphere
               </span>
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            <p className="text-xs text-gray-500 leading-relaxed mb-4">
               Authoritative career infrastructure for high-growth tech talent,
               executives, and forward-thinking engineering organizations.
             </p>
-            <div className="inline-flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-low border border-surface-container">
-              <span className="w-2 h-2 rounded-full bg-secondary"></span>
-              <span className="font-label-sm text-label-sm text-on-surface font-medium">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-gray-50 border border-gray-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-[11px] text-gray-700 font-semibold">
                 Systems Operational
               </span>
             </div>
           </div>
 
-          {/* Nav Column 1 */}
+          {/* Column 1: Career Discovery */}
           <div>
-            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-md font-semibold">
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
               Career Discovery
             </h4>
-            <ul className="space-y-space-sm">
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+            <ul className="space-y-2 text-xs text-gray-500">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Software Engineering
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Machine Learning & AI
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Product Leadership
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Remote-First Roles
               </li>
             </ul>
           </div>
 
-          {/* Nav Column 2 */}
+          {/* Column 2: Candidate Intelligence */}
           <div>
-            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-md font-semibold">
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
               Candidate Intelligence
             </h4>
-            <ul className="space-y-space-sm">
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+            <ul className="space-y-2 text-xs text-gray-500">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Verified Compensation Index
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Tech Stack Market Pulse
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Interview Trajectory Map
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Executive Placement Desk
               </li>
             </ul>
           </div>
 
-          {/* Nav Column 3 */}
+          {/* Column 3: Platform & Trust */}
           <div>
-            <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-md font-semibold">
+            <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
               Platform & Trust
             </h4>
-            <ul className="space-y-space-sm">
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+            <ul className="space-y-2 text-xs text-gray-500">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Privacy & Discretion Protocol
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Verified Hiring Standards
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Security Compliance
               </li>
-              <li className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+              <li className="hover:text-gray-900 cursor-pointer transition-colors">
                 Engineering Support
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom copyright and legal pill banner */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-space-lg bg-surface-container-low px-space-lg py-space-md rounded-xl gap-space-md">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            © 2026 WorkSphere Technologies Inc. Built for institutional reliability.
-          </p>
-          <div className="flex items-center gap-space-lg">
-            <Link
-              href="/privacy-policy"
-              className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors"
-            >
+        {/* Bottom copyright and legal links */}
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-100 text-xs text-gray-400 gap-3">
+          <p>© 2025 WorkSphere Technologies Inc. Built for institutional reliability.</p>
+          <div className="flex items-center gap-6">
+            <Link href="/privacy-policy" className="hover:text-gray-600 transition-colors">
               Terms of Service
             </Link>
-            <Link
-              href="/privacy-policy"
-              className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors"
-            >
+            <Link href="/privacy-policy" className="hover:text-gray-600 transition-colors">
               Candidate Privacy
             </Link>
-            <span className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">
+            <Link href="/help" className="hover:text-gray-600 transition-colors">
               Security Portal
-            </span>
+            </Link>
           </div>
         </div>
       </div>

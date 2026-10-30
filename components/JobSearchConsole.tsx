@@ -2,6 +2,18 @@
 
 import React from "react";
 import { JobFilterState } from "@/typescript/interface/job.interface";
+import {
+  Briefcase,
+  MapPin,
+  Crosshair,
+  Search,
+  X,
+  TrendingUp,
+  Check,
+  DollarSign,
+  Zap,
+  SlidersHorizontal,
+} from "lucide-react";
 
 interface JobSearchConsoleProps {
   filters: JobFilterState;
@@ -23,64 +35,55 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-surface pb-space-xl">
-      {/* Interactive Background Glow Elements */}
-      <div className="absolute -top-40 right-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute top-20 -left-20 w-[450px] h-[450px] bg-secondary/5 rounded-full blur-2xl pointer-events-none"></div>
-
-      {/* Search Canvas Container */}
-      <div className="max-w-[1280px] mx-auto px-gutter pt-space-lg w-full relative z-10">
-        {/* Market Pulse Micro Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-space-sm mb-space-md bg-surface-container-low px-space-md py-space-xs rounded-full border border-surface-container">
-          <div className="flex items-center gap-space-sm">
-            <span className="flex h-2 w-2 rounded-full bg-secondary animate-pulse"></span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+    <div className="relative w-full bg-slate-50/50 pb-8 pt-4">
+      <div className="max-w-[1280px] mx-auto px-4 w-full">
+        {/* Live Market Feed Micro Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 px-3 py-1.5 rounded-full text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="font-bold tracking-wider text-gray-600 uppercase text-[11px]">
               Live Market Feed
             </span>
-            <span className="text-outline-variant">•</span>
-            <span className="font-body-sm text-body-sm text-on-surface font-medium">
+            <span className="text-gray-300">•</span>
+            <span className="text-gray-600 font-medium">
               3,420 high-growth roles vetted this week
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-space-md">
-            <span className="font-label-sm text-label-sm text-secondary font-semibold flex items-center gap-1">
-              <span className="material-symbols-outlined text-[15px]">
-                trending_up
-              </span>
+          <div className="hidden md:flex items-center gap-3">
+            <span className="text-emerald-700 font-semibold flex items-center gap-1">
+              <TrendingUp size={14} className="text-emerald-600" />
               Avg. Staff Comp +14.2% YoY
             </span>
-            <span className="text-outline-variant">•</span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant">
+            <span className="text-gray-300">•</span>
+            <span className="text-gray-500">
               San Francisco / NYC / Remote Hubs
             </span>
           </div>
         </div>
 
-        {/* Main Search Console Card */}
-        <div className="bg-surface-container-lowest rounded-xl p-space-md md:p-space-lg shadow-xl shadow-surface-dim/30 border border-surface-container">
+        {/* Search Console Card */}
+        <div className="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-200/80">
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-12 gap-space-sm md:gap-space-md items-center"
+            className="grid grid-cols-1 md:grid-cols-12 gap-3 items-stretch"
           >
-            {/* Role / Tech Input */}
-            <div className="md:col-span-5 relative flex items-center bg-surface-container-low rounded-lg px-space-md py-2.5 focus-within:bg-surface-container transition-all">
-              <span className="material-symbols-outlined text-primary text-[22px] mr-space-sm shrink-0">
-                work
-              </span>
+            {/* Role / Keywords Input */}
+            <div className="md:col-span-5 relative flex items-center bg-gray-50/90 rounded-xl px-3.5 py-2 border border-gray-200/70 focus-within:border-indigo-500 focus-within:bg-white transition-all">
+              <Briefcase size={20} className="text-indigo-600 mr-3 shrink-0" />
               <div className="flex flex-col w-full min-w-0">
                 <label
                   htmlFor="searchRole"
-                  className="font-label-sm text-[10px] text-on-surface-variant font-semibold tracking-wider uppercase"
+                  className="text-[10px] text-gray-500 font-bold uppercase tracking-wider"
                 >
-                  Role or keywords
+                  Role or Keywords
                 </label>
                 <input
                   id="searchRole"
                   type="text"
                   value={filters.roleQuery}
                   onChange={(e) => onFilterChange("roleQuery", e.target.value)}
-                  placeholder="Design Systems, Staff Engineer, Stripe..."
-                  className="w-full bg-transparent font-headline-sm text-headline-sm text-on-surface focus:outline-none placeholder:text-outline-variant placeholder:font-normal"
+                  placeholder="Senior Product Designer, Staff Engineer..."
+                  className="w-full bg-transparent text-sm font-semibold text-gray-900 focus:outline-none placeholder:text-gray-400 placeholder:font-normal py-0.5"
                 />
               </div>
               {filters.roleQuery && (
@@ -88,24 +91,20 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
                   type="button"
                   aria-label="Clear role"
                   onClick={() => onFilterChange("roleQuery", "")}
-                  className="text-outline hover:text-on-surface transition-colors"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                 >
-                  <span className="material-symbols-outlined text-[16px]">
-                    cancel
-                  </span>
+                  <X size={16} />
                 </button>
               )}
             </div>
 
-            {/* Location / Remote Input */}
-            <div className="md:col-span-4 relative flex items-center bg-surface-container-low rounded-lg px-space-md py-2.5 focus-within:bg-surface-container transition-all">
-              <span className="material-symbols-outlined text-secondary text-[22px] mr-space-sm shrink-0">
-                location_on
-              </span>
+            {/* Location Input */}
+            <div className="md:col-span-4 relative flex items-center bg-gray-50/90 rounded-xl px-3.5 py-2 border border-gray-200/70 focus-within:border-indigo-500 focus-within:bg-white transition-all">
+              <MapPin size={20} className="text-emerald-600 mr-3 shrink-0" />
               <div className="flex flex-col w-full min-w-0">
                 <label
                   htmlFor="searchLocation"
-                  className="font-label-sm text-[10px] text-on-surface-variant font-semibold tracking-wider uppercase"
+                  className="text-[10px] text-gray-500 font-bold uppercase tracking-wider"
                 >
                   Location
                 </label>
@@ -116,25 +115,23 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
                   onChange={(e) =>
                     onFilterChange("locationQuery", e.target.value)
                   }
-                  placeholder="Remote, San Francisco, New York..."
-                  className="w-full bg-transparent font-headline-sm text-headline-sm text-on-surface focus:outline-none placeholder:text-outline-variant placeholder:font-normal"
+                  placeholder="San Francisco, CA or Remote"
+                  className="w-full bg-transparent text-sm font-semibold text-gray-900 focus:outline-none placeholder:text-gray-400 placeholder:font-normal py-0.5"
                 />
               </div>
-              <span className="material-symbols-outlined text-outline-variant text-[18px]">
-                near_me
-              </span>
+              <Crosshair size={16} className="text-gray-400 shrink-0 ml-1" />
             </div>
 
-            {/* Radius / Distance Selector */}
-            <div className="md:col-span-1 relative flex items-center bg-surface-container-low rounded-lg px-space-sm py-2.5 h-full">
+            {/* Radius Selector */}
+            <div className="md:col-span-1 relative flex items-center bg-gray-50/90 rounded-xl px-3 py-2 border border-gray-200/70">
               <div className="flex flex-col w-full">
-                <span className="font-label-sm text-[10px] text-on-surface-variant font-semibold uppercase">
+                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
                   Radius
                 </span>
                 <select
                   value={filters.radius}
                   onChange={(e) => onFilterChange("radius", e.target.value)}
-                  className="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none cursor-pointer"
+                  className="bg-transparent text-xs font-semibold text-gray-800 focus:outline-none cursor-pointer py-1"
                 >
                   <option value="Exact">Exact</option>
                   <option value="+25 mi">+25 mi</option>
@@ -144,92 +141,81 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
               </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="md:col-span-2 flex items-center">
+            {/* Find Roles Submit Button */}
+            <div className="md:col-span-2 flex items-stretch">
               <button
                 type="submit"
-                className="w-full h-[52px] bg-primary-container text-on-primary rounded-lg font-headline-sm text-headline-sm flex items-center justify-center gap-space-sm shadow-md shadow-primary/25 hover:bg-primary active:scale-[0.99] transition-all cursor-pointer font-semibold"
+                className="w-full h-full min-h-[48px] bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  search
-                </span>
+                <Search size={18} className="stroke-[2.5]" />
                 <span>Find Roles</span>
               </button>
             </div>
           </form>
 
-          {/* Quick Pill Filters Bar */}
-          <div className="flex items-center gap-space-xs flex-wrap mt-space-md pt-space-sm border-t border-surface-container/60">
-            <span className="font-label-sm text-label-sm text-on-surface-variant mr-space-xs uppercase tracking-wider font-semibold">
+          {/* Fast Filters Pills Row */}
+          <div className="flex items-center gap-2 flex-wrap mt-4 pt-3 border-t border-gray-100">
+            <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider mr-1">
               Fast Filters:
             </span>
 
-            {/* Remote Only Pill */}
+            {/* Remote Only */}
             <button
               type="button"
-              onClick={() =>
-                onFilterChange("remoteOnly", !filters.remoteOnly)
-              }
-              className={`group flex items-center gap-1.5 px-space-md py-1 rounded-full font-body-sm text-body-sm transition-all ${
+              onClick={() => onFilterChange("remoteOnly", !filters.remoteOnly)}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
                 filters.remoteOnly
-                  ? "bg-primary-fixed text-on-primary-fixed font-semibold"
-                  : "bg-surface-container text-on-surface hover:bg-surface-container-high"
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-semibold"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               }`}
             >
               <span
-                className={`w-2 h-2 rounded-full ${
-                  filters.remoteOnly ? "bg-primary" : "bg-secondary"
+                className={`w-1.5 h-1.5 rounded-full ${
+                  filters.remoteOnly ? "bg-indigo-600" : "bg-emerald-500"
                 }`}
               ></span>
-              <span className="font-medium">Remote Only</span>
-              <span
-                className={`material-symbols-outlined text-[14px] ${
-                  filters.remoteOnly ? "text-primary" : "text-outline"
-                }`}
-              >
-                check
-              </span>
+              <span>Remote Only</span>
+              <Check
+                size={13}
+                className={filters.remoteOnly ? "text-indigo-600" : "text-gray-400"}
+              />
             </button>
 
-            {/* Full-time Pill */}
+            {/* Full-time */}
             <button
               type="button"
               onClick={() =>
                 onFilterChange("fullTimeOnly", !filters.fullTimeOnly)
               }
-              className={`group flex items-center gap-1.5 px-space-md py-1 rounded-full font-body-sm text-body-sm transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
                 filters.fullTimeOnly
-                  ? "bg-primary-fixed text-on-primary-fixed font-semibold"
-                  : "bg-surface-container-low text-on-surface hover:bg-surface-container"
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-semibold"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               }`}
             >
               <span>Full-time</span>
             </button>
 
-            {/* $150k+ Pill */}
+            {/* $150k+ Pill (Highlight green as in design) */}
             <button
               type="button"
               onClick={() =>
                 onFilterChange("minSalary150k", !filters.minSalary150k)
               }
-              className={`group flex items-center gap-1.5 px-space-md py-1 rounded-full font-body-sm text-body-sm shadow-sm transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                 filters.minSalary150k
-                  ? "bg-secondary-fixed text-on-secondary-fixed font-semibold"
-                  : "bg-surface-container-low text-on-surface hover:bg-surface-container"
+                  ? "bg-emerald-100 border-emerald-300 text-emerald-800 shadow-2xs"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <span className="material-symbols-outlined text-[15px]">
-                payments
-              </span>
-              <span className="font-medium">$150k+</span>
+              <DollarSign size={13} className="text-emerald-700 -mr-0.5" />
+              <span>$150k+</span>
               {filters.minSalary150k && (
-                <span className="material-symbols-outlined text-[14px]">
-                  close
-                </span>
+                <X size={13} className="text-emerald-700 ml-0.5 hover:opacity-75" />
               )}
             </button>
 
-            {/* Product & Engineering Pill */}
+            {/* Product & Engineering */}
             <button
               type="button"
               onClick={() =>
@@ -240,37 +226,37 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
                     : "Product & Engineering"
                 )
               }
-              className={`group flex items-center gap-1.5 px-space-md py-1 rounded-full font-body-sm text-body-sm transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
                 filters.category === "Product & Engineering"
-                  ? "bg-primary-fixed text-on-primary-fixed font-semibold"
-                  : "bg-surface-container-low text-on-surface hover:bg-surface-container"
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-semibold"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
               }`}
             >
               <span>Product & Engineering</span>
             </button>
 
-            {/* Easy Apply Pill */}
+            {/* Easy Apply */}
             <button
               type="button"
               onClick={() =>
                 onFilterChange("easyApplyOnly", !filters.easyApplyOnly)
               }
-              className={`group flex items-center gap-1.5 px-space-md py-1 rounded-full font-body-sm text-body-sm font-semibold transition-all ${
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
                 filters.easyApplyOnly
-                  ? "bg-primary text-on-primary"
-                  : "bg-surface-container-high text-primary hover:bg-primary hover:text-on-primary"
+                  ? "bg-indigo-600 border-indigo-600 text-white"
+                  : "bg-indigo-50 border-indigo-100 text-indigo-700 hover:bg-indigo-100"
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">bolt</span>
+              <Zap size={13} className="fill-current" />
               <span>Easy Apply</span>
             </button>
 
-            {/* More Filters Pill */}
+            {/* More Filters */}
             <button
               type="button"
-              className="group flex items-center gap-1.5 px-space-md py-1 rounded-full bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container transition-all"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[15px]">tune</span>
+              <SlidersHorizontal size={13} className="text-gray-500" />
               <span>More Filters (6)</span>
             </button>
           </div>
@@ -281,4 +267,3 @@ export const JobSearchConsole: React.FC<JobSearchConsoleProps> = ({
 };
 
 export default JobSearchConsole;
-

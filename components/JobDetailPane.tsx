@@ -2,6 +2,15 @@
 
 import React, { useState } from "react";
 import { JobItem } from "@/typescript/interface/job.interface";
+import {
+  CheckCircle2,
+  MapPin,
+  Clock,
+  Eye,
+  Share2,
+  Bookmark,
+  Zap,
+} from "lucide-react";
 
 interface JobDetailPaneProps {
   job: JobItem | null;
@@ -24,139 +33,129 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
 
   if (!job) {
     return (
-      <div className="bg-surface-container-lowest rounded-xl p-space-xl text-center border border-surface-container">
-        <p className="font-headline-sm text-on-surface">Select a job to view details</p>
+      <div className="bg-white rounded-2xl p-10 text-center border border-gray-200 shadow-sm">
+        <p className="text-sm font-semibold text-gray-700">
+          Select a job to view details
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="sticky top-20 bg-surface-container-lowest rounded-xl shadow-xl shadow-surface-dim/40 overflow-hidden border border-surface-container">
-      {/* Banner Hero Header on Selected Job */}
-      <div className="relative bg-gradient-to-r from-surface-container-highest via-surface-container to-surface-container-low p-space-lg">
-        <div className="flex items-start justify-between gap-space-md">
-          <div className="flex items-start gap-space-md">
-            <div className="w-16 h-16 rounded-xl bg-surface-container-lowest p-2 shadow-md shrink-0 flex items-center justify-center border border-surface-container">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
+      {/* Top Header Card */}
+      <div className="p-6 pb-5 border-b border-gray-100">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-200/70 p-2 shrink-0 flex items-center justify-center">
               <img
                 src={job.companyLogo}
                 alt={`${job.company} logo`}
-                className="w-12 h-12 object-contain"
+                className="w-10 h-10 object-contain"
               />
             </div>
             <div>
-              <div className="flex items-center gap-space-xs">
-                <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base font-bold text-gray-900">
                   {job.company}
                 </span>
                 {job.verified && (
-                  <span className="material-symbols-outlined text-secondary text-[18px]">
-                    verified
-                  </span>
+                  <CheckCircle2
+                    size={16}
+                    className="text-emerald-600 fill-emerald-50"
+                  />
                 )}
                 {job.fundingStage && (
-                  <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold ml-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
                     {job.fundingStage}
                   </span>
                 )}
               </div>
 
-              <h2
-                className="font-headline-lg text-headline-lg text-on-surface mt-1 font-bold"
-                id="detailTitle"
-              >
-                {job.title} - {job.department}
+              <h2 className="text-xl font-bold text-gray-900 mt-1 tracking-tight">
+                {job.title} - {job.department.split("&")[0].trim()}
               </h2>
 
-              <div className="flex flex-wrap items-center gap-x-space-md gap-y-1 mt-1 text-on-surface-variant font-body-sm text-body-sm">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-gray-500 font-medium">
                 <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">
-                    location_on
-                  </span>{" "}
+                  <MapPin size={13} className="text-gray-400" />
                   {job.location}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">
-                    schedule
-                  </span>{" "}
+                  <Clock size={13} className="text-gray-400" />
                   Full-time Role
                 </span>
                 <span>•</span>
-                <span className="flex items-center gap-1 text-secondary font-medium">
-                  <span className="material-symbols-outlined text-[16px]">
-                    visibility
-                  </span>{" "}
+                <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                  <Eye size={13} className="text-emerald-600" />
                   {job.viewsToday || 43} people viewed today
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Top Action Controls */}
-          <div className="flex items-center gap-space-xs shrink-0">
+          {/* Action Icons (Share & Bookmark) */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               aria-label="Share Job"
               onClick={() => onShareClick?.(job)}
-              className="w-10 h-10 rounded-lg bg-surface-container-lowest hover:bg-surface-container flex items-center justify-center text-on-surface transition-colors shadow-sm border border-surface-container"
+              className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                share
-              </span>
+              <Share2 size={17} />
             </button>
             <button
               type="button"
-              aria-label={isSaved ? "Unsave Job" : "Save to Bookmarks"}
+              aria-label={isSaved ? "Unsave Job" : "Save Job"}
               onClick={(e) => onToggleSave(job.id, e)}
-              className="w-10 h-10 rounded-lg bg-surface-container-lowest hover:bg-surface-container flex items-center justify-center text-primary transition-colors shadow-sm border border-surface-container"
+              className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-indigo-600 transition-colors cursor-pointer"
             >
-              <span
-                className="material-symbols-outlined text-[20px]"
-                style={{ fontVariationSettings: `'FILL' ${isSaved ? 1 : 0}` }}
-              >
-                bookmark
-              </span>
+              <Bookmark
+                size={17}
+                className={isSaved ? "fill-indigo-600 text-indigo-600" : ""}
+              />
             </button>
           </div>
         </div>
 
-        {/* Action CTA Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-space-md mt-space-lg pt-space-md bg-surface-container-lowest/80 backdrop-blur-md p-space-md rounded-xl border border-surface-container/60">
+        {/* Total Base Compensation Box */}
+        <div className="mt-5 p-4 rounded-xl bg-slate-50/80 border border-gray-200/60 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
               Total Base Compensation
             </p>
-            <div className="flex items-baseline gap-space-xs">
-              <span className="font-headline-xl text-headline-xl text-on-surface tracking-tight font-bold">
-                {job.salaryRange}
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="text-2xl font-black text-gray-900 tracking-tight">
+                {job.salaryRange.replace("k", ",000").replace("k", ",000")}
               </span>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">
+              <span className="text-xs text-gray-500 font-medium">
                 {job.equityInfo || "/ year + Significant Equity"}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-space-sm">
+          <div>
             <button
               type="button"
               onClick={() => onApplyClick(job)}
-              className="h-11 px-space-xl bg-primary-container text-on-primary rounded-lg font-headline-sm text-headline-sm flex items-center gap-space-xs shadow-md shadow-primary/30 hover:bg-primary active:scale-[0.98] transition-all cursor-pointer font-semibold"
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[20px]">bolt</span>
+              <Zap size={16} className="fill-current" />
               <span>Apply Now</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation for Detail Pane */}
-      <div className="flex items-center gap-space-md px-space-lg bg-surface-container-lowest border-b border-surface-container">
+      {/* Tabs */}
+      <div className="flex items-center gap-6 px-6 border-b border-gray-200 text-xs font-semibold">
         <button
           type="button"
           onClick={() => setActiveTab("overview")}
-          className={`py-space-md font-headline-sm text-headline-sm transition-all border-b-2 ${
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
             activeTab === "overview"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant border-transparent hover:text-on-surface"
+              ? "text-indigo-600 border-indigo-600 font-bold"
+              : "text-gray-500 border-transparent hover:text-gray-800"
           }`}
         >
           Overview
@@ -164,10 +163,10 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab("team")}
-          className={`py-space-md font-body-md text-body-md transition-all border-b-2 ${
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
             activeTab === "team"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant border-transparent hover:text-on-surface"
+              ? "text-indigo-600 border-indigo-600 font-bold"
+              : "text-gray-500 border-transparent hover:text-gray-800"
           }`}
         >
           Team & Culture
@@ -175,10 +174,10 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab("benefits")}
-          className={`py-space-md font-body-md text-body-md transition-all border-b-2 ${
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
             activeTab === "benefits"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant border-transparent hover:text-on-surface"
+              ? "text-indigo-600 border-indigo-600 font-bold"
+              : "text-gray-500 border-transparent hover:text-gray-800"
           }`}
         >
           Salary & Benefits
@@ -186,216 +185,127 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab("interview")}
-          className={`py-space-md font-body-md text-body-md transition-all border-b-2 ${
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
             activeTab === "interview"
-              ? "text-primary border-primary font-bold"
-              : "text-on-surface-variant border-transparent hover:text-on-surface"
+              ? "text-indigo-600 border-indigo-600 font-bold"
+              : "text-gray-500 border-transparent hover:text-gray-800"
           }`}
         >
           Interview Process
         </button>
       </div>
 
-      {/* Scrollable Pane Body */}
-      <div className="p-space-lg space-y-space-lg max-h-[calc(100vh-22rem)] overflow-y-auto pr-space-md">
+      {/* Tab Content Body */}
+      <div className="p-6 space-y-6 max-h-[calc(100vh-23rem)] overflow-y-auto">
         {activeTab === "overview" && (
           <>
-            {/* Executive Hiring Manager Card */}
-            <div className="bg-surface-container-low p-space-md rounded-xl flex items-center justify-between border border-surface-container">
-              <div className="flex items-center gap-space-md">
+            {/* Hiring Manager Card */}
+            <div className="p-3.5 rounded-xl bg-gray-50/80 border border-gray-200/70 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <img
                   src={job.hiringManager.avatar}
                   alt={job.hiringManager.name}
-                  className="w-12 h-12 rounded-full object-cover shadow-sm border border-surface-container"
+                  className="w-11 h-11 rounded-full object-cover border border-gray-200"
                 />
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-900">
                       {job.hiringManager.name}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold">
                       Hiring Manager
                     </span>
                   </div>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  <p className="text-[11px] text-gray-500 mt-0.5">
                     {job.hiringManager.title}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                className="px-space-md py-1.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors shadow-sm border border-surface-container"
+                className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-2xs cursor-pointer"
               >
                 View Profile
               </button>
             </div>
 
-            {/* Role Scope Overview */}
+            {/* About the Role */}
             <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-space-sm font-semibold">
+              <h3 className="text-sm font-bold text-gray-900 mb-2">
                 About the Role
               </h3>
               {job.aboutRole.map((paragraph, idx) => (
                 <p
                   key={idx}
-                  className="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-sm"
+                  className="text-xs text-gray-600 leading-relaxed mb-2.5 font-normal"
                 >
                   {paragraph}
                 </p>
               ))}
             </div>
 
-            {/* Requirements / Qualifications */}
+            {/* Key Responsibilities & Qualifications */}
             <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface mb-space-md font-semibold">
+              <h3 className="text-sm font-bold text-gray-900 mb-2.5">
                 Key Responsibilities & Qualifications
               </h3>
-              <div className="space-y-space-sm">
-                {job.responsibilities.map((req, idx) => (
-                  <div key={idx} className="flex items-start gap-space-sm">
-                    <span className="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">
-                      check_circle
+              <ul className="space-y-2">
+                {job.responsibilities.map((resp, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5">
+                    <CheckCircle2
+                      size={15}
+                      className="text-emerald-600 shrink-0 mt-0.5"
+                    />
+                    <span className="text-xs text-gray-600 leading-relaxed font-normal">
+                      {resp}
                     </span>
-                    <p className="font-body-md text-body-md text-on-surface-variant">
-                      {req}
-                    </p>
-                  </div>
+                  </li>
                 ))}
-              </div>
-            </div>
-
-            {/* Visual Culture Metrics & Stats */}
-            <div className="bg-surface-container-low p-space-md rounded-xl border border-surface-container">
-              <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-md font-semibold">
-                Team Culture & Engineering Benchmarks
-              </h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-space-md text-center">
-                {job.cultureStats.map((stat, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-surface-container-lowest p-space-sm rounded-lg shadow-sm border border-surface-container/60"
-                  >
-                    <p
-                      className={`font-headline-lg text-headline-lg font-bold ${
-                        stat.highlight === "primary"
-                          ? "text-primary"
-                          : stat.highlight === "secondary"
-                          ? "text-secondary"
-                          : "text-on-surface"
-                      }`}
-                    >
-                      {stat.value}
-                    </p>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Tech Stack & Required Tools */}
-            <div>
-              <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-sm font-semibold">
-                Required Tools & Paradigms
-              </h4>
-              <div className="flex flex-wrap gap-space-xs">
-                {job.requiredTools.map((tool, idx) => (
-                  <span
-                    key={idx}
-                    className="px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm font-medium border border-surface-container/60"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Benefits Bento */}
-            <div>
-              <h4 className="font-headline-sm text-headline-sm text-on-surface mb-space-md font-semibold">
-                Verified Total Rewards
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-                {job.rewards.map((perk, idx) => (
-                  <div
-                    key={idx}
-                    className="p-space-md rounded-xl bg-surface-container-low flex items-start gap-space-sm border border-surface-container/60"
-                  >
-                    <span
-                      className={`material-symbols-outlined text-[24px] ${
-                        perk.color === "secondary"
-                          ? "text-secondary"
-                          : "text-primary"
-                      }`}
-                    >
-                      {perk.icon}
-                    </span>
-                    <div>
-                      <h5 className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                        {perk.title}
-                      </h5>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        {perk.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              </ul>
             </div>
           </>
         )}
 
         {activeTab === "team" && (
-          <div className="space-y-space-md">
-            <h3 className="font-headline-md text-on-surface font-semibold">
-              Team & Mission
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-gray-900">
+              Culture & Engineering Metrics
             </h3>
-            <p className="font-body-md text-on-surface-variant leading-relaxed">
-              Our teams operate with extreme autonomy, minimal managerial layers,
-              and direct user feedback loops. Engineers and designers pair
-              daily, submitting code directly into shared codebases.
-            </p>
-            <div className="p-space-md rounded-xl bg-surface-container-low border border-surface-container">
-              <h4 className="font-headline-sm text-on-surface font-semibold mb-2">
-                Work Cadence
-              </h4>
-              <ul className="space-y-2 text-on-surface-variant font-body-sm">
-                <li>• Flexible async communication policy via Slack & Linear</li>
-                <li>• Focus Wednesdays: Zero internal team meetings</li>
-                <li>• Bi-annual in-person company product hackathons</li>
-              </ul>
+            <div className="grid grid-cols-2 gap-3">
+              {job.cultureStats.map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 rounded-xl bg-gray-50 border border-gray-100"
+                >
+                  <p className="text-[10px] text-gray-500 font-semibold uppercase">
+                    {stat.label}
+                  </p>
+                  <p className="text-base font-bold text-gray-900 mt-0.5">
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {activeTab === "benefits" && (
-          <div className="space-y-space-md">
-            <h3 className="font-headline-md text-on-surface font-semibold">
-              Comprehensive Compensation & Rewards
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-gray-900 mb-2">
+              Benefits & Perks
             </h3>
-            <p className="font-body-md text-on-surface-variant leading-relaxed">
-              We offer top of market cash compensation benchmarked against top
-              95th percentile tier-1 tech firms, with transparent annual band
-              reviews.
-            </p>
-            <div className="grid grid-cols-1 gap-space-sm">
-              {job.rewards.map((perk, idx) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {job.rewards.map((reward, idx) => (
                 <div
                   key={idx}
-                  className="p-space-md rounded-xl bg-surface-container-low flex items-start gap-space-md border border-surface-container"
+                  className="p-3 rounded-xl bg-gray-50 border border-gray-100"
                 >
-                  <span className="material-symbols-outlined text-[26px] text-primary">
-                    {perk.icon}
-                  </span>
-                  <div>
-                    <h5 className="font-headline-sm text-on-surface font-semibold">
-                      {perk.title}
-                    </h5>
-                    <p className="font-body-sm text-on-surface-variant">
-                      {perk.description}
-                    </p>
-                  </div>
+                  <p className="text-xs font-bold text-gray-900">
+                    {reward.title}
+                  </p>
+                  <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                    {reward.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -403,70 +313,56 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
         )}
 
         {activeTab === "interview" && (
-          <div className="space-y-space-md">
-            <h3 className="font-headline-md text-on-surface font-semibold">
-              Transparent Interview Stages
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-gray-900">
+              Hiring Process Overview
             </h3>
-            <div className="space-y-space-sm">
-              <div className="p-space-md rounded-xl bg-surface-container-low border border-surface-container">
-                <span className="font-label-sm text-primary font-bold">
-                  Stage 1: 30 Mins
+            <div className="space-y-2">
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  1
                 </span>
-                <h5 className="font-headline-sm text-on-surface font-semibold">
-                  Recruiter & Values Alignment
-                </h5>
-                <p className="font-body-sm text-on-surface-variant">
-                  Discussion regarding background, career aspirations, and team fit.
-                </p>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">
+                    Recruiter Initial Screen (30m)
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    Mutual fit, background alignment, and compensation expectations.
+                  </p>
+                </div>
               </div>
-              <div className="p-space-md rounded-xl bg-surface-container-low border border-surface-container">
-                <span className="font-label-sm text-primary font-bold">
-                  Stage 2: 45 Mins
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  2
                 </span>
-                <h5 className="font-headline-sm text-on-surface font-semibold">
-                  Portfolio & Technical Deep Dive with {job.hiringManager.name}
-                </h5>
-                <p className="font-body-sm text-on-surface-variant">
-                  Walkthrough of real-world design systems or frontend infrastructure you built.
-                </p>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">
+                    Hiring Manager Portfolio Deep-Dive (45m)
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    Walkthrough of high-impact systems projects and design craft.
+                  </p>
+                </div>
               </div>
-              <div className="p-space-md rounded-xl bg-surface-container-low border border-surface-container">
-                <span className="font-label-sm text-primary font-bold">
-                  Stage 3: Half-Day
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  3
                 </span>
-                <h5 className="font-headline-sm text-on-surface font-semibold">
-                  Virtual Onsite & Cross-Functional Collaboration
-                </h5>
-                <p className="font-body-sm text-on-surface-variant">
-                  Paid practical pairing session with product managers and engineers.
-                </p>
+                <div>
+                  <p className="text-xs font-bold text-gray-900">
+                    Collaborative Systems Design Session (60m)
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    Real-time pairing on token taxonomy, state logic, and component architecture.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         )}
-
-        {/* Sticky Bottom Prompt in Pane */}
-        <div className="p-space-md rounded-xl bg-primary text-on-primary flex items-center justify-between shadow-lg">
-          <div>
-            <p className="font-headline-sm text-headline-sm font-semibold">
-              Ready to build for millions of developers?
-            </p>
-            <p className="font-body-sm text-body-sm opacity-90">
-              Your profile is a {job.skillsMatch}% direct match for this position.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onApplyClick(job)}
-            className="px-space-lg py-2.5 bg-surface-container-lowest text-primary rounded-lg font-headline-sm text-headline-sm hover:bg-surface-container transition-all cursor-pointer font-semibold shrink-0"
-          >
-            Submit Profile
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 export default JobDetailPane;
-

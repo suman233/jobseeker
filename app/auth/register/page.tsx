@@ -1,10 +1,18 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { registerUserApi } from "@/api/functions/user.api";
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  UserPlus,
+  Briefcase,
+} from "lucide-react";
 
 interface RegisterFormData {
   name: string;
@@ -12,7 +20,7 @@ interface RegisterFormData {
   password: string;
 }
 
-function RegisterContent() {
+export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,12 +54,11 @@ function RegisterContent() {
 
       if (res.status) {
         setSuccessMsg(
-          res.message ||
-            "Verification code sent! Redirecting to email verification..."
+          res.message || "Registration successful! A verification code has been sent."
         );
         setTimeout(() => {
           router.push(`/auth/otp?email=${encodeURIComponent(data.email.trim())}`);
-        }, 800);
+        }, 1000);
       } else {
         setErrorMsg(res.message || "Registration failed.");
       }
@@ -63,7 +70,7 @@ function RegisterContent() {
       setErrorMsg(
         apiErr.response?.data?.message ||
           apiErr.message ||
-          "Failed to connect to backend server."
+          "Failed to register candidate account."
       );
     } finally {
       setLoading(false);
@@ -71,48 +78,43 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col justify-center items-center px-gutter py-space-xl">
-      <div className="w-full max-w-md bg-surface-container-lowest p-space-xl rounded-2xl shadow-xl border border-surface-container">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 py-12">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
         {/* Brand */}
-        <div className="flex items-center gap-space-sm mb-space-lg">
-          <img
-            alt="WorkSphere Logo"
-            className="h-8 w-auto object-contain"
-            src="https://lh3.googleusercontent.com/aida/AEtjO1Uvn_q5sMy6ZFlruW4qTx3MUU0DgKXJb3-GrOKP1u92HxxUoXSF6FcKU9LwEVAX0plxGfq90R6IEmEaTYZT8o5tjIMlNwQqRZRzp9w526wNddubsHU3y2csTc7vuG1Rj74eJG_dYbXU3gavTSYDmdDpqABqX4GonMoZ15AuLk3nT-WjEDKGzhArW0lPSVD0SlaSAtVSgEbnbaEAEQCJJrnmwGTMw9y_LY1qLwGNDoo"
-          />
-          <span className="font-headline-sm text-headline-sm text-on-surface font-bold">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <Briefcase size={18} className="stroke-[2.5]" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-gray-900 font-sans">
             WorkSphere
           </span>
         </div>
 
-        <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold mb-1">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
           Create Candidate Profile
         </h2>
-        <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
-          Register to find high-growth tech positions. You will verify your email with a 6-digit OTP code.
+        <p className="text-xs text-gray-500 mb-6">
+          Join vetted high-growth technology talent with direct hiring access.
         </p>
 
         {errorMsg && (
-          <div className="mb-space-md p-space-sm rounded-lg bg-error-container text-on-error-container text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">error</span>
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+            <AlertCircle size={16} className="shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
         {successMsg && (
-          <div className="mb-space-md p-space-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">
-              check_circle
-            </span>
+          <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+            <CheckCircle2 size={16} className="shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-space-md">
-          {/* Full Name field */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label
               htmlFor="name"
-              className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+              className="block text-xs font-bold text-gray-700 mb-1"
             >
               Full Name
             </label>
@@ -126,53 +128,47 @@ function RegisterContent() {
                   value: 3,
                   message: "Name must be at least 3 characters",
                 },
-                maxLength: {
-                  value: 50,
-                  message: "Name must be under 50 characters",
-                },
               })}
-              className="w-full px-space-md py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
             />
             {errors.name && (
-              <p className="mt-1 text-label-sm text-error">
+              <p className="mt-1 text-[11px] text-red-600">
                 {errors.name.message}
               </p>
             )}
           </div>
 
-          {/* Email field */}
           <div>
             <label
               htmlFor="email"
-              className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+              className="block text-xs font-bold text-gray-700 mb-1"
             >
               Email Address
             </label>
             <input
               id="email"
               type="email"
-              placeholder="alex.morgan@example.com"
+              placeholder="name@example.com"
               {...register("email", {
-                required: "Email address is required",
+                required: "Email is required",
                 pattern: {
                   value: /^\S+@\S+\.\S+$/,
-                  message: "Please enter a valid email address",
+                  message: "Please enter a valid email",
                 },
               })}
-              className="w-full px-space-md py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
             />
             {errors.email && (
-              <p className="mt-1 text-label-sm text-error">
+              <p className="mt-1 text-[11px] text-red-600">
                 {errors.email.message}
               </p>
             )}
           </div>
 
-          {/* Password field with Visibility Toggle */}
           <div>
             <label
               htmlFor="password"
-              className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+              className="block text-xs font-bold text-gray-700 mb-1"
             >
               Password
             </label>
@@ -180,7 +176,7 @@ function RegisterContent() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Create a secure password (min. 6 chars)"
+                placeholder="Create password (min. 6 characters)"
                 {...register("password", {
                   required: "Password is required",
                   minLength: {
@@ -188,22 +184,20 @@ function RegisterContent() {
                     message: "Password must be at least 6 characters",
                   },
                 })}
-                className="w-full pl-space-md pr-11 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+                className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px] select-none">
-                  {showPassword ? "visibility_off" : "visibility"}
-                </span>
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-label-sm text-error">
+              <p className="mt-1 text-[11px] text-red-600">
                 {errors.password.message}
               </p>
             )}
@@ -212,62 +206,32 @@ function RegisterContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-space-md rounded-xl bg-primary text-on-primary font-headline-sm text-body-md font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all cursor-pointer"
           >
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
-                <span>Creating Account & Sending OTP...</span>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>Creating Profile...</span>
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[18px]">
-                  person_add
-                </span>
-                <span>Register & Send OTP</span>
+                <UserPlus size={15} />
+                <span>Create Account & Verify OTP</span>
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-space-lg pt-space-md border-t border-surface-container text-center">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Already have an account?{" "}
-            <Link
-              href="/auth/login"
-              className="text-primary hover:underline font-semibold"
-            >
-              Sign In
-            </Link>
-          </p>
-        </div>
-
-        <div className="mt-space-md text-center">
+        <div className="mt-6 text-center text-xs text-gray-500">
+          Already registered?{" "}
           <Link
-            href="/"
-            className="font-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-flex items-center gap-1"
+            href="/auth/login"
+            className="text-indigo-600 font-semibold hover:underline"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
-            <span>Return to Job Board</span>
+            Sign in
           </Link>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-surface">
-          <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      }
-    >
-      <RegisterContent />
-    </Suspense>
   );
 }

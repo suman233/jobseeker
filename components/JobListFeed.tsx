@@ -3,6 +3,7 @@
 import React from "react";
 import { JobItem, JobFilterState } from "@/typescript/interface/job.interface";
 import JobCard from "./JobCard";
+import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
 
 interface JobListFeedProps {
   jobs: JobItem[];
@@ -34,21 +35,21 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex flex-col gap-space-md">
+    <div className="flex flex-col gap-4">
       {/* Column Header & Sorter Controls */}
-      <div className="flex items-center justify-between pb-space-xs bg-surface border-b border-surface-container/60">
+      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
         <div>
-          <p className="font-headline-sm text-headline-sm text-on-surface font-semibold">
+          <p className="text-base font-bold text-gray-900 leading-tight">
             {totalCount} Opportunities Found
           </p>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
+          <p className="text-xs text-gray-500 mt-0.5">
             Ranked by relevancy & market trajectory
           </p>
         </div>
-        <div className="flex items-center gap-space-xs">
+        <div className="flex items-center gap-1.5">
           <label
             htmlFor="sortBy"
-            className="font-label-sm text-label-sm text-on-surface-variant uppercase font-semibold"
+            className="text-[11px] text-gray-500 font-bold uppercase tracking-wider"
           >
             Sort:
           </label>
@@ -58,27 +59,25 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
             onChange={(e) =>
               onSortChange(e.target.value as JobFilterState["sortBy"])
             }
-            className="bg-surface-container-low font-body-sm text-body-sm text-on-surface rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer border border-surface-container"
+            className="bg-white border border-gray-200 text-xs font-semibold text-gray-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-2xs"
           >
-            <option value="relevancy">Highest Match</option>
             <option value="recent">Most Recent</option>
-            <option value="comp">Compensation (High to Low)</option>
+            <option value="relevancy">Highest Match</option>
+            <option value="comp">Compensation</option>
             <option value="urgent">Urgent Hiring</option>
           </select>
         </div>
       </div>
 
       {/* Job Cards List Stack */}
-      <div className="flex flex-col gap-space-sm" id="jobsListContainer">
+      <div className="flex flex-col gap-3" id="jobsListContainer">
         {jobs.length === 0 ? (
-          <div className="bg-surface-container-lowest rounded-xl p-space-xl text-center border border-surface-container">
-            <span className="material-symbols-outlined text-[36px] text-outline mb-2">
-              search_off
-            </span>
-            <p className="font-headline-sm text-on-surface font-medium">
+          <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-2xs">
+            <SearchX size={36} className="text-gray-400 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-gray-800">
               No matching opportunities found
             </p>
-            <p className="font-body-sm text-on-surface-variant mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Try adjusting your role keywords or filters to see more listings.
             </p>
           </div>
@@ -99,21 +98,19 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
 
       {/* Bottom Pagination */}
       {jobs.length > 0 && (
-        <div className="flex items-center justify-between pt-space-sm pb-space-lg">
-          <span className="font-body-sm text-body-sm text-on-surface-variant">
+        <div className="flex items-center justify-between pt-2 pb-6 text-xs text-gray-500">
+          <span>
             Showing 1-{jobs.length} of {totalCount} positions
           </span>
-          <div className="flex items-center gap-space-xs">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               disabled={currentPage <= 1}
               onClick={() => onPageChange(currentPage - 1)}
               aria-label="Previous Page"
-              className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-8 h-8 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                chevron_left
-              </span>
+              <ChevronLeft size={16} />
             </button>
             {Array.from({ length: totalPages }).map((_, idx) => {
               const pageNum = idx + 1;
@@ -123,10 +120,10 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
                   key={pageNum}
                   type="button"
                   onClick={() => onPageChange(pageNum)}
-                  className={`w-9 h-9 rounded-lg font-headline-sm text-headline-sm flex items-center justify-center transition-all ${
+                  className={`w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
                     isActive
-                      ? "bg-primary-container text-on-primary shadow-sm"
-                      : "bg-surface-container-low hover:bg-surface-container text-on-surface"
+                      ? "bg-indigo-600 text-white shadow-2xs"
+                      : "bg-white border border-gray-200 hover:bg-gray-50 text-gray-700"
                   }`}
                 >
                   {pageNum}
@@ -138,11 +135,9 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
               disabled={currentPage >= totalPages}
               onClick={() => onPageChange(currentPage + 1)}
               aria-label="Next Page"
-              className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="w-8 h-8 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                chevron_right
-              </span>
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
@@ -152,4 +147,3 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
 };
 
 export default JobListFeed;
-

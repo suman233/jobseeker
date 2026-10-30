@@ -6,6 +6,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { loginUserApi } from "@/api/functions/user.api";
 import { useAuthStore } from "@/zustand/auth.zustand";
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  LogIn,
+  Briefcase,
+} from "lucide-react";
 
 interface LoginFormData {
   email: string;
@@ -47,7 +55,6 @@ function LoginContent() {
       });
 
       if (res.requireOtp) {
-        // User needs to verify email with OTP first
         router.push(`/auth/otp?email=${encodeURIComponent(data.email.trim())}`);
         return;
       }
@@ -87,83 +94,77 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col justify-center items-center px-gutter py-space-xl">
-      <div className="w-full max-w-md bg-surface-container-lowest p-space-xl rounded-2xl shadow-xl border border-surface-container">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 py-12">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
         {/* Brand */}
-        <div className="flex items-center gap-space-sm mb-space-lg">
-          <img
-            alt="WorkSphere Logo"
-            className="h-8 w-auto object-contain"
-            src="https://lh3.googleusercontent.com/aida/AEtjO1Uvn_q5sMy6ZFlruW4qTx3MUU0DgKXJb3-GrOKP1u92HxxUoXSF6FcKU9LwEVAX0plxGfq90R6IEmEaTYZT8o5tjIMlNwQqRZRzp9w526wNddubsHU3y2csTc7vuG1Rj74eJG_dYbXU3gavTSYDmdDpqABqX4GonMoZ15AuLk3nT-WjEDKGzhArW0lPSVD0SlaSAtVSgEbnbaEAEQCJJrnmwGTMw9y_LY1qLwGNDoo"
-          />
-          <span className="font-headline-sm text-headline-sm text-on-surface font-bold">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+            <Briefcase size={18} className="stroke-[2.5]" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-gray-900 font-sans">
             WorkSphere
           </span>
         </div>
 
-        <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold mb-1">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
           Candidate Sign In
         </h2>
-        <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
+        <p className="text-xs text-gray-500 mb-6">
           Welcome back! Access your profile, saved jobs, and applications.
         </p>
 
         {errorMsg && (
-          <div className="mb-space-md p-space-sm rounded-lg bg-error-container text-on-error-container text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">error</span>
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+            <AlertCircle size={16} className="shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
         {successMsg && (
-          <div className="mb-space-md p-space-sm rounded-lg bg-secondary-fixed text-on-secondary-fixed text-body-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">
-              check_circle
-            </span>
+          <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+            <CheckCircle2 size={16} className="shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-space-md">
-          {/* Email field */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label
               htmlFor="email"
-              className="block font-label-md text-label-md text-on-surface font-medium mb-1"
+              className="block text-xs font-bold text-gray-700 mb-1"
             >
               Email Address
             </label>
             <input
               id="email"
               type="email"
-              placeholder="candidate@worksphere.com"
+              placeholder="name@example.com"
               {...register("email", {
-                required: "Email address is required",
+                required: "Email is required",
                 pattern: {
                   value: /^\S+@\S+\.\S+$/,
-                  message: "Please enter a valid email address",
+                  message: "Please enter a valid email",
                 },
               })}
-              className="w-full px-space-md py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
             />
             {errors.email && (
-              <p className="mt-1 text-label-sm text-error">
+              <p className="mt-1 text-[11px] text-red-600">
                 {errors.email.message}
               </p>
             )}
           </div>
 
-          {/* Password field with Visibility Toggle */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <label
                 htmlFor="password"
-                className="block font-label-md text-label-md text-on-surface font-medium"
+                className="text-xs font-bold text-gray-700"
               >
                 Password
               </label>
               <Link
                 href="/auth/forgot-password"
-                className="text-label-sm text-primary hover:underline"
+                className="text-xs text-indigo-600 hover:underline font-medium"
               >
                 Forgot?
               </Link>
@@ -180,22 +181,20 @@ function LoginContent() {
                     message: "Password must be at least 6 characters",
                   },
                 })}
-                className="w-full pl-space-md pr-11 py-2.5 rounded-xl bg-surface-container-low border border-surface-container text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest text-body-md"
+                className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-indigo-600 focus:bg-white text-xs transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px] select-none">
-                  {showPassword ? "visibility_off" : "visibility"}
-                </span>
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-label-sm text-error">
+              <p className="mt-1 text-[11px] text-red-600">
                 {errors.password.message}
               </p>
             )}
@@ -204,45 +203,29 @@ function LoginContent() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-space-md rounded-xl bg-primary text-on-primary font-headline-sm text-body-md font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all cursor-pointer"
           >
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 <span>Signing in...</span>
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[18px]">
-                  login
-                </span>
+                <LogIn size={15} />
                 <span>Sign In</span>
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-space-lg pt-space-md border-t border-surface-container text-center">
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Don&apos;t have an account yet?{" "}
-            <Link
-              href="/auth/register"
-              className="text-primary hover:underline font-semibold"
-            >
-              Sign Up as Candidate
-            </Link>
-          </p>
-        </div>
-
-        <div className="mt-space-md text-center">
+        <div className="mt-6 text-center text-xs text-gray-500">
+          Don&apos;t have an account?{" "}
           <Link
-            href="/"
-            className="font-body-sm text-on-surface-variant hover:text-on-surface transition-colors inline-flex items-center gap-1"
+            href="/auth/register"
+            className="text-indigo-600 font-semibold hover:underline"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
-            <span>Return to Job Board</span>
+            Create an account
           </Link>
         </div>
       </div>
@@ -254,8 +237,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-surface">
-          <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       }
     >
