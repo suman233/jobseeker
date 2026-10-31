@@ -270,7 +270,7 @@ export default function Home() {
           text: `Check out this ${job.title} role at ${job.company} with ${job.salaryRange} on WorkSphere!`,
           url: window.location.href,
         })
-        .catch(() => {});
+        .catch(() => { });
     } else if (typeof navigator !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
       alert("Job link copied to clipboard!");
