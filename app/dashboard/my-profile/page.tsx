@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
+import { mediaUrl } from "@/utils/media";
 import {
   CheckCircle2,
   Mail,
@@ -73,10 +74,14 @@ export default function MyProfilePage() {
                 <img
                   alt={`${user.name} Profile`}
                   src={
-                    user.image ||
+                    mediaUrl(user.image, "user") ||
                     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80"
                   }
                   className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-md bg-white"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80";
+                  }}
                 />
                 <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
               </div>

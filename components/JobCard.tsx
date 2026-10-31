@@ -41,9 +41,12 @@ export const JobCard: React.FC<JobCardProps> = ({
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 p-1">
             <img
-              src={mediaUrl(job.companyLogo)}
+              src={mediaUrl(job.companyLogo, "job")}
               alt={`${job.company} logo`}
               className="w-9 h-9 object-contain"
+              onError={(e) => {
+                e.currentTarget.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=128&q=80";
+              }}
             />
           </div>
           <div className="min-w-0">

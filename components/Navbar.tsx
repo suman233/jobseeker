@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserProfile } from "@/api/functions/user.api";
 import { useAuth } from "@/hooks/useAuth";
+import { mediaUrl } from "@/utils/media";
 import {
   Search,
   Bookmark,
@@ -174,10 +175,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <img
                   alt={`${user.name} Avatar`}
                   src={
-                    user.image ||
+                    mediaUrl(user.image, "user") ||
                     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80"
                   }
                   className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-2xs"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80";
+                  }}
                 />
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="text-xs font-bold text-gray-900 leading-tight">

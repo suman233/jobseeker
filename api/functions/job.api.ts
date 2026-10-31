@@ -8,6 +8,7 @@ import {
 } from "@/typescript/interface/job.interface";
 import { INITIAL_JOBS } from "@/lib/jobData";
 import { APP_CONFIG } from "@/config/constants";
+import { mediaUrl } from "@/utils/media";
 
 export interface JobsListResponse {
   status: boolean;
@@ -38,9 +39,7 @@ function formatRelativeTime(dateString?: string): string {
 export const formatJobItem = (raw: any, index: number = 0): JobItem => {
   const id = raw._id || raw.id || `job-${index + 1}`;
   const companyLogo = raw.companyLogo
-    ? raw.companyLogo.startsWith("http")
-      ? raw.companyLogo
-      : `${APP_CONFIG.apiUrl}/${raw.companyLogo.replace(/^\/+/, "").replace(/\\/g, "/")}`
+    ? mediaUrl(raw.companyLogo, "job")
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuD4MvwGVVIM-VqfhKpnmmtvThCkCUKgIaW6FHbIR9XriDqIAa4n9dNsx9rLOKcKauAu99VlT8gqFV4agpRCPQvIoP6xtLJqpIznimdPBYfUY4l7-M6kYLUdMyFd1_jB8hUTRnMnbMqdy7UMxBHw7hgoXknRppVbbi8qPAqhVe5_DXKq-y63jNdZg7D0pnYTWXVTuSMxff7NBqgtPhipQnI8RrTfu-QoneneBfOXc9Y";
 
   const isRemote =
@@ -114,9 +113,9 @@ export const formatJobItem = (raw: any, index: number = 0): JobItem => {
     hiringManager: {
       name: raw.hiringManager?.name || "Elena Rostova",
       title: raw.hiringManager?.role || raw.hiringManager?.title || "Hiring Manager",
-      avatar:
-        raw.hiringManager?.avatar ||
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAo81yckfrM7JUjuD72mMqDJl2Y0Wj9hbiD3gy-zB-oPIIT0QL5kM3P-sR1_FErRkEaaxo-FA_k4lSilxtl090tGVL5Ko-SXVtPEpMvpcZI66iN-UpzGwWEJgqHOjwkMYf4nx505Vx8I2PWT2GJa-SdtLgvyuBKI37WW-aKlSjaCxMc6UM47qP_3T7XERTCYUoBvBbs_hyOwYhjeQYAGyyAGDrXda3PQDmDQFO05lo",
+      avatar: raw.hiringManager?.avatar
+        ? mediaUrl(raw.hiringManager.avatar, "user")
+        : "https://lh3.googleusercontent.com/aida-public/AB6AXuAo81yckfrM7JUjuD72mMqDJl2Y0Wj9hbiD3gy-zB-oPIIT0QL5kM3P-sR1_FErRkEaaxo-FA_k4lSilxtl090tGVL5Ko-SXVtPEpMvpcZI66iN-UpzGwWEJgqHOjwkMYf4nx505Vx8I2PWT2GJa-SdtLgvyuBKI37WW-aKlSjaCxMc6UM47qP_3T7XERTCYUoBvBbs_hyOwYhjeQYAGyyAGDrXda3PQDmDQFO05lo",
     },
     aboutRole,
     responsibilities,

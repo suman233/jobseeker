@@ -102,9 +102,12 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-200/70 p-2 shrink-0 flex items-center justify-center">
               <img
-                src={mediaUrl(job.companyLogo)}
+                src={mediaUrl(job.companyLogo, "job")}
                 alt={`${job.company} logo`}
                 className="w-10 h-10 object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=128&q=80";
+                }}
               />
             </div>
             <div>
@@ -252,9 +255,12 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
             <div className="p-3.5 rounded-xl bg-gray-50/80 border border-gray-200/70 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
-                  src={mediaUrl(job.hiringManager.avatar)}
+                  src={mediaUrl(job.hiringManager.avatar, "user")}
                   alt={job.hiringManager.name}
                   className="w-11 h-11 rounded-full object-cover border border-gray-200"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80";
+                  }}
                 />
                 <div>
                   <div className="flex items-center gap-2">
