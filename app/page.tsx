@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JobSearchConsole from "@/components/JobSearchConsole";
@@ -10,6 +10,7 @@ import ApplyModal from "@/components/ApplyModal";
 import AuthModal from "@/components/AuthModal";
 import { INITIAL_JOBS } from "@/lib/jobData";
 import { JobItem, JobFilterState } from "@/typescript/interface/job.interface";
+import { fetchJobsApi } from "@/api/functions/job.api";
 import { UserProfile } from "@/api/functions/user.api";
 import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, X } from "lucide-react";
@@ -19,24 +20,28 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authBannerMsg, setAuthBannerMsg] = useState("");
 
-  // Search & Filter State matching design defaults
+  // Search & Filter State - starts completely EMPTY as requested
   const [filters, setFilters] = useState<JobFilterState>({
-    roleQuery: "Senior Product Designer",
-    locationQuery: "San Francisco, CA or Remote",
+    roleQuery: "",
+    locationQuery: "",
     radius: "+50 mi",
     remoteOnly: false,
     fullTimeOnly: false,
-    minSalary150k: true,
+    minSalary150k: false,
     category: "All",
     easyApplyOnly: false,
     sortBy: "recent",
   });
 
-  // Selected job for right-hand preview pane (Stripe ID 1 by default)
-  const [selectedJobId, setSelectedJobId] = useState<number>(1);
+  // Dynamic jobs list from backend API
+  const [allJobs, setAllJobs] = useState<JobItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Selected job for right-hand preview pane
+  const [selectedJobId, setSelectedJobId] = useState<number | string>("");
 
   // Saved bookmark IDs
-  const [savedJobIds, setSavedJobIds] = useState<Set<number>>(new Set([1]));
+  const [savedJobIds, setSavedJobIds] = useState<Set<number | string>>(new Set());
 
   // 1-Click Fast Apply Modal State
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -49,10 +54,66 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 5;
 
-  // Filter & Sort Logic matching reference display
+  // Load jobs from Backend API
+  const loadJobsFromApi = useCallback(async (currentFilters: JobFilterState) => {
+    setIsLoading(true);
+    try {
+      const res = await fetchJobsApi(currentFilters);
+      if (res && res.data && res.data.length > 0) {
+        setAllJobs(res.data);
+        setSelectedJobId((prev) => {
+          if (prev && res.data.some((j) => String(j.id) === String(prev))) {
+            return prev;
+          }
+          return res.data[0].id;
+        });
+      } else {
+        setAllJobs(INITIAL_JOBS);
+        if (INITIAL_JOBS.length > 0) {
+          setSelectedJobId(INITIAL_JOBS[0].id);
+        }
+      }
+    } catch (err) {
+      console.warn("API load failed, using local catalog:", err);
+      setAllJobs(INITIAL_JOBS);
+      if (INITIAL_JOBS.length > 0) {
+        setSelectedJobId(INITIAL_JOBS[0].id);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial fetch on mount
+  useEffect(() => {
+    loadJobsFromApi(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced search trigger when typing in search inputs or toggling filters
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadJobsFromApi(filters);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [
+    filters.roleQuery,
+    filters.locationQuery,
+    filters.remoteOnly,
+    filters.fullTimeOnly,
+    filters.minSalary150k,
+    filters.category,
+    filters.easyApplyOnly,
+    filters.sortBy,
+    loadJobsFromApi,
+  ]);
+
+  // Synchronous client-side filter over loaded jobs for instantaneous feedback
   const filteredJobs = useMemo(() => {
-    return INITIAL_JOBS.filter((job) => {
-      // Role query matching (Design / Product keywords)
+    const source = allJobs.length > 0 ? allJobs : INITIAL_JOBS;
+    return source.filter((job) => {
+      // Role / Keywords query matching
       if (filters.roleQuery.trim()) {
         const query = filters.roleQuery.toLowerCase();
         const words = query.split(/\s+/).filter(Boolean);
@@ -60,8 +121,8 @@ export default function Home() {
           (w) =>
             job.title.toLowerCase().includes(w) ||
             job.company.toLowerCase().includes(w) ||
-            job.department.toLowerCase().includes(w) ||
-            job.requiredTools.some((t) => t.toLowerCase().includes(w))
+            (job.department && job.department.toLowerCase().includes(w)) ||
+            (job.requiredTools && job.requiredTools.some((t) => t.toLowerCase().includes(w)))
         );
         if (!matchesAnyWord) return false;
       }
@@ -83,7 +144,7 @@ export default function Home() {
       if (filters.remoteOnly && !job.isRemote) return false;
       if (filters.fullTimeOnly && !job.isFullTime) return false;
       if (filters.easyApplyOnly && !job.isEasyApply) return false;
-      if (filters.minSalary150k && job.salaryMin < 150000) return false;
+      if (filters.minSalary150k && (job.salaryMin || 0) < 150000) return false;
 
       // Category
       if (filters.category !== "All" && job.category !== filters.category) {
@@ -93,15 +154,15 @@ export default function Home() {
       return true;
     }).sort((a, b) => {
       if (filters.sortBy === "comp") {
-        return b.salaryMax - a.salaryMax;
+        return (b.salaryMax || 0) - (a.salaryMax || 0);
       }
       return 0;
     });
-  }, [filters]);
+  }, [allJobs, filters]);
 
-  // Total opportunities count display (148 matching reference)
-  const totalCount = filteredJobs.length > 0 ? 148 : 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / 74)); // 2 pages matching design
+  // Total opportunities count display
+  const totalCount = filteredJobs.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   // Paginated slice
   const paginatedJobs = useMemo(() => {
@@ -111,7 +172,7 @@ export default function Home() {
 
   // Active selected job details
   const activeJob = useMemo(() => {
-    const found = filteredJobs.find((j) => j.id === selectedJobId);
+    const found = filteredJobs.find((j) => String(j.id) === String(selectedJobId));
     return found || filteredJobs[0] || null;
   }, [filteredJobs, selectedJobId]);
 
@@ -126,10 +187,11 @@ export default function Home() {
 
   const handleSearchSubmit = () => {
     setCurrentPage(1);
+    loadJobsFromApi(filters);
   };
 
   // Select job card (and open drawer on mobile)
-  const handleSelectJob = (id: number) => {
+  const handleSelectJob = (id: number | string) => {
     setSelectedJobId(id);
     if (window.innerWidth < 1024) {
       setMobileDetailOpen(true);
@@ -137,7 +199,7 @@ export default function Home() {
   };
 
   // Toggle bookmark save
-  const handleToggleSave = (id: number, e: React.MouseEvent) => {
+  const handleToggleSave = (id: number | string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSavedJobIds((prev) => {
       const next = new Set(prev);
@@ -235,7 +297,7 @@ export default function Home() {
 
       {/* Main Content Area */}
       <main className="pt-16 min-h-screen bg-slate-50/60 flex flex-col">
-        {/* 2. Top Job Search & Filter Console */}
+        {/* 2. Top Job Search & Filter Console (Starts empty, triggers search seamlessly) */}
         <JobSearchConsole
           filters={filters}
           onFilterChange={handleFilterChange}
@@ -244,7 +306,7 @@ export default function Home() {
 
         {/* 3. Split-Pane Layout Container: Left Feed (5 cols) + Right Detail Pane (7 cols) */}
         <div className="flex-1 max-w-[1280px] w-full mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column (5/12 cols): Job Feed */}
+          {/* Left Column (5/12 cols): Job Feed with MUI Skeleton Loader */}
           <div className="lg:col-span-5 w-full">
             <JobListFeed
               jobs={paginatedJobs}
@@ -254,6 +316,7 @@ export default function Home() {
               sortBy={filters.sortBy}
               currentPage={currentPage}
               totalPages={totalPages}
+              isLoading={isLoading}
               onSelectJob={handleSelectJob}
               onToggleSave={handleToggleSave}
               onQuickApply={handleQuickApply}
@@ -262,11 +325,12 @@ export default function Home() {
             />
           </div>
 
-          {/* Right Column (7/12 cols): Sticky Job Detail Pane */}
+          {/* Right Column (7/12 cols): Sticky Job Detail Pane with MUI Skeleton Loader */}
           <div className="lg:col-span-7 w-full hidden lg:block sticky top-20">
             <JobDetailPane
               job={activeJob}
               isSaved={activeJob ? savedJobIds.has(activeJob.id) : false}
+              isLoading={isLoading}
               onToggleSave={handleToggleSave}
               onApplyClick={handleApplyNow}
               onShareClick={handleShare}
@@ -294,6 +358,7 @@ export default function Home() {
                 <JobDetailPane
                   job={activeJob}
                   isSaved={savedJobIds.has(activeJob.id)}
+                  isLoading={isLoading}
                   onToggleSave={handleToggleSave}
                   onApplyClick={(job) => {
                     setMobileDetailOpen(false);

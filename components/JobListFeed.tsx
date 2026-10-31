@@ -4,17 +4,19 @@ import React from "react";
 import { JobItem, JobFilterState } from "@/typescript/interface/job.interface";
 import JobCard from "./JobCard";
 import { ChevronLeft, ChevronRight, SearchX } from "lucide-react";
+import Skeleton from "@mui/material/Skeleton";
 
 interface JobListFeedProps {
   jobs: JobItem[];
   totalCount: number;
-  selectedJobId: number;
-  savedJobIds: Set<number>;
+  selectedJobId: number | string;
+  savedJobIds: Set<number | string>;
   sortBy: JobFilterState["sortBy"];
   currentPage: number;
   totalPages: number;
-  onSelectJob: (id: number) => void;
-  onToggleSave: (id: number, e: React.MouseEvent) => void;
+  isLoading?: boolean;
+  onSelectJob: (id: number | string) => void;
+  onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onQuickApply: (job: JobItem, e: React.MouseEvent) => void;
   onSortChange: (sort: JobFilterState["sortBy"]) => void;
   onPageChange: (page: number) => void;
@@ -28,6 +30,7 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
   sortBy,
   currentPage,
   totalPages,
+  isLoading = false,
   onSelectJob,
   onToggleSave,
   onQuickApply,
@@ -39,9 +42,13 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
       {/* Column Header & Sorter Controls */}
       <div className="flex items-center justify-between pb-2 border-b border-gray-200">
         <div>
-          <p className="text-base font-bold text-gray-900 leading-tight">
-            {totalCount} Opportunities Found
-          </p>
+          {isLoading ? (
+            <Skeleton variant="text" width={180} height={26} animation="wave" />
+          ) : (
+            <p className="text-base font-bold text-gray-900 leading-tight">
+              {totalCount} Opportunities Found
+            </p>
+          )}
           <p className="text-xs text-gray-500 mt-0.5">
             Ranked by relevancy & market trajectory
           </p>
@@ -71,7 +78,88 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
 
       {/* Job Cards List Stack */}
       <div className="flex flex-col gap-3" id="jobsListContainer">
-        {jobs.length === 0 ? (
+        {isLoading ? (
+          // MUI Skeleton Loaders (5 Job Card Skeletons)
+          Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={`skeleton-${i}`}
+              className="bg-white rounded-xl p-4 border border-gray-200/80 space-y-3"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3 w-full">
+                  <Skeleton
+                    variant="rounded"
+                    width={44}
+                    height={44}
+                    animation="wave"
+                    sx={{ borderRadius: "8px", flexShrink: 0 }}
+                  />
+                  <div className="w-full space-y-1.5">
+                    <Skeleton
+                      variant="text"
+                      width="35%"
+                      height={16}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      variant="text"
+                      width="75%"
+                      height={20}
+                      animation="wave"
+                    />
+                  </div>
+                </div>
+                <Skeleton
+                  variant="circular"
+                  width={22}
+                  height={22}
+                  animation="wave"
+                  sx={{ flexShrink: 0 }}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <Skeleton
+                  variant="rounded"
+                  width={80}
+                  height={20}
+                  animation="wave"
+                  sx={{ borderRadius: "4px" }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={90}
+                  height={20}
+                  animation="wave"
+                  sx={{ borderRadius: "4px" }}
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={60}
+                  height={20}
+                  animation="wave"
+                  sx={{ borderRadius: "4px" }}
+                />
+              </div>
+
+              <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                <Skeleton
+                  variant="text"
+                  width={110}
+                  height={22}
+                  animation="wave"
+                />
+                <Skeleton
+                  variant="rounded"
+                  width={85}
+                  height={26}
+                  animation="wave"
+                  sx={{ borderRadius: "6px" }}
+                />
+              </div>
+            </div>
+          ))
+        ) : jobs.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center border border-gray-200 shadow-2xs">
             <SearchX size={36} className="text-gray-400 mx-auto mb-2" />
             <p className="text-sm font-semibold text-gray-800">
@@ -97,7 +185,7 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
       </div>
 
       {/* Bottom Pagination */}
-      {jobs.length > 0 && (
+      {!isLoading && jobs.length > 0 && (
         <div className="flex items-center justify-between pt-2 pb-6 text-xs text-gray-500">
           <span>
             Showing 1-{jobs.length} of {totalCount} positions

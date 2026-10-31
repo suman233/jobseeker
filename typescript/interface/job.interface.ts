@@ -18,7 +18,8 @@ export interface RewardPerk {
 }
 
 export interface JobItem {
-  id: number;
+  id: number | string;
+  _id?: string;
   title: string;
   company: string;
   companyLogo: string;
@@ -30,6 +31,7 @@ export interface JobItem {
   salaryRange: string;
   salaryMin: number;
   salaryMax: number;
+  salaryText?: string;
   equityInfo?: string;
   postedAt: string;
   skillsMatch: number;
@@ -48,6 +50,7 @@ export interface JobItem {
   isFullTime: boolean;
   isEasyApply: boolean;
   category: string;
+  createdAt?: string;
 }
 
 export interface JobFilterState {
@@ -63,7 +66,7 @@ export interface JobFilterState {
 }
 
 export interface ApplicationSubmission {
-  jobId: number;
+  jobId: number | string;
   jobTitle: string;
   company: string;
   resumeFileName: string;

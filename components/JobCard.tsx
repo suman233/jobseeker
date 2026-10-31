@@ -8,8 +8,8 @@ interface JobCardProps {
   job: JobItem;
   isSelected: boolean;
   isSaved: boolean;
-  onSelect: (id: number) => void;
-  onToggleSave: (id: number, e: React.MouseEvent) => void;
+  onSelect: (id: number | string) => void;
+  onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onQuickApply: (job: JobItem, e: React.MouseEvent) => void;
 }
 

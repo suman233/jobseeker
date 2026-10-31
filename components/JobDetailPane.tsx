@@ -11,11 +11,13 @@ import {
   Bookmark,
   Zap,
 } from "lucide-react";
+import Skeleton from "@mui/material/Skeleton";
 
 interface JobDetailPaneProps {
   job: JobItem | null;
   isSaved: boolean;
-  onToggleSave: (id: number, e: React.MouseEvent) => void;
+  isLoading?: boolean;
+  onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onApplyClick: (job: JobItem) => void;
   onShareClick?: (job: JobItem) => void;
 }
@@ -23,6 +25,7 @@ interface JobDetailPaneProps {
 export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
   job,
   isSaved,
+  isLoading = false,
   onToggleSave,
   onApplyClick,
   onShareClick,
@@ -30,6 +33,55 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
   const [activeTab, setActiveTab] = useState<
     "overview" | "team" | "benefits" | "interview"
   >("overview");
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden p-6 space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4 w-full">
+            <Skeleton
+              variant="rounded"
+              width={56}
+              height={56}
+              animation="wave"
+              sx={{ borderRadius: "12px", flexShrink: 0 }}
+            />
+            <div className="space-y-2 w-full">
+              <Skeleton variant="text" width="40%" height={22} animation="wave" />
+              <Skeleton variant="text" width="80%" height={32} animation="wave" />
+              <Skeleton variant="text" width="60%" height={18} animation="wave" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton variant="rounded" width={36} height={36} animation="wave" sx={{ borderRadius: "8px" }} />
+            <Skeleton variant="rounded" width={36} height={36} animation="wave" sx={{ borderRadius: "8px" }} />
+          </div>
+        </div>
+
+        <div className="bg-gray-50/80 rounded-xl p-4 space-y-2 border border-gray-100">
+          <Skeleton variant="text" width={180} height={18} animation="wave" />
+          <Skeleton variant="text" width={260} height={36} animation="wave" />
+          <div className="pt-2">
+            <Skeleton variant="rounded" width={140} height={38} animation="wave" sx={{ borderRadius: "8px" }} />
+          </div>
+        </div>
+
+        <div className="space-y-3 pt-2">
+          <Skeleton variant="text" width={140} height={24} animation="wave" />
+          <Skeleton variant="text" width="100%" height={20} animation="wave" />
+          <Skeleton variant="text" width="95%" height={20} animation="wave" />
+          <Skeleton variant="text" width="90%" height={20} animation="wave" />
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <Skeleton variant="text" width={180} height={24} animation="wave" />
+          <Skeleton variant="text" width="100%" height={18} animation="wave" />
+          <Skeleton variant="text" width="98%" height={18} animation="wave" />
+          <Skeleton variant="text" width="92%" height={18} animation="wave" />
+        </div>
+      </div>
+    );
+  }
 
   if (!job) {
     return (
