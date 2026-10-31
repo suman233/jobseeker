@@ -30,6 +30,7 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (user: UserProfile, token: string) => void;
+  initialMode?: "login" | "register";
 }
 
 interface AuthFormInputs {
@@ -43,13 +44,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
+  initialMode = "login",
 }) => {
-  const [mode, setMode] = useState<"login" | "register" | "otp">("login");
+  const [mode, setMode] = useState<"login" | "register" | "otp">(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [otpEmail, setOtpEmail] = useState("");
+
+  // Sync mode whenever modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setErrorMsg("");
+      setSuccessMsg("");
+    }
+  }, [isOpen, initialMode]);
 
   // Pre-registration Email Verification states
   const [isEmailVerified, setIsEmailVerified] = useState(false);

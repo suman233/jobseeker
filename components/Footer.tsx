@@ -98,6 +98,11 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright and legal links */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-100 text-xs text-gray-400 gap-3">
           <p>© 2025 WorkSphere Technologies Inc. Built for institutional reliability.</p>
+          <p className="creator-credit">
+            <span className="creator-line"></span>
+            Crafted with <span className="heart">♥</span> by
+            <a href="#" className="creator-name hover:text-gray-600 transition-colors"> SK</a>
+          </p>
           <div className="flex items-center gap-6">
             <Link href="/privacy-policy" className="hover:text-gray-600 transition-colors">
               Terms of Service

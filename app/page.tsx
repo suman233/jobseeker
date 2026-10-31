@@ -212,14 +212,26 @@ export default function Home() {
     });
   };
 
-  // Trigger 1-Click Fast Apply modal
+  // Trigger 1-Click Fast Apply modal (Requires Authentication)
   const handleQuickApply = (job: JobItem, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!currentUser) {
+      setJobToApply(job);
+      setAuthBannerMsg("Please sign in to apply for this position.");
+      setIsAuthModalOpen(true);
+      return;
+    }
     setJobToApply(job);
     setIsApplyModalOpen(true);
   };
 
   const handleApplyNow = (job: JobItem) => {
+    if (!currentUser) {
+      setJobToApply(job);
+      setAuthBannerMsg("Please sign in to apply for this position.");
+      setIsAuthModalOpen(true);
+      return;
+    }
     setJobToApply(job);
     setIsApplyModalOpen(true);
   };
@@ -241,6 +253,12 @@ export default function Home() {
       `Welcome, ${user.name}! Your profile is active and verified in WorkSphere.`
     );
     setTimeout(() => setAuthBannerMsg(""), 6000);
+    // If candidate clicked apply before logging in, seamlessly open application modal
+    if (jobToApply) {
+      setTimeout(() => {
+        setIsApplyModalOpen(true);
+      }, 400);
+    }
   };
 
   // Share job link
@@ -386,6 +404,7 @@ export default function Home() {
       {/* Unified Auth Modal (Sign In / Register / Verify OTP) */}
       <AuthModal
         isOpen={isAuthModalOpen}
+        initialMode="login"
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={handleAuthSuccess}
       />
