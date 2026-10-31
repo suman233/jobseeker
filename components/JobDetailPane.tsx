@@ -12,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import Skeleton from "@mui/material/Skeleton";
+import { mediaUrl } from "@/utils/media";
 
 interface JobDetailPaneProps {
   job: JobItem | null;
@@ -101,7 +102,7 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-200/70 p-2 shrink-0 flex items-center justify-center">
               <img
-                src={job.companyLogo}
+                src={mediaUrl(job.companyLogo)}
                 alt={`${job.company} logo`}
                 className="w-10 h-10 object-contain"
               />
@@ -204,44 +205,40 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
         <button
           type="button"
           onClick={() => setActiveTab("overview")}
-          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
-            activeTab === "overview"
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${activeTab === "overview"
               ? "text-indigo-600 border-indigo-600 font-bold"
               : "text-gray-500 border-transparent hover:text-gray-800"
-          }`}
+            }`}
         >
           Overview
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("team")}
-          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
-            activeTab === "team"
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${activeTab === "team"
               ? "text-indigo-600 border-indigo-600 font-bold"
               : "text-gray-500 border-transparent hover:text-gray-800"
-          }`}
+            }`}
         >
           Team & Culture
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("benefits")}
-          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
-            activeTab === "benefits"
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${activeTab === "benefits"
               ? "text-indigo-600 border-indigo-600 font-bold"
               : "text-gray-500 border-transparent hover:text-gray-800"
-          }`}
+            }`}
         >
           Salary & Benefits
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("interview")}
-          className={`py-3.5 border-b-2 transition-all cursor-pointer ${
-            activeTab === "interview"
+          className={`py-3.5 border-b-2 transition-all cursor-pointer ${activeTab === "interview"
               ? "text-indigo-600 border-indigo-600 font-bold"
               : "text-gray-500 border-transparent hover:text-gray-800"
-          }`}
+            }`}
         >
           Interview Process
         </button>
@@ -255,7 +252,7 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
             <div className="p-3.5 rounded-xl bg-gray-50/80 border border-gray-200/70 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
-                  src={job.hiringManager.avatar}
+                  src={mediaUrl(job.hiringManager.avatar)}
                   alt={job.hiringManager.name}
                   className="w-11 h-11 rounded-full object-cover border border-gray-200"
                 />

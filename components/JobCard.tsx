@@ -3,6 +3,7 @@
 import React from "react";
 import { JobItem } from "@/typescript/interface/job.interface";
 import { CheckCircle2, Bookmark, Zap, Users, Clock } from "lucide-react";
+import { mediaUrl } from "@/utils/media";
 
 interface JobCardProps {
   job: JobItem;
@@ -40,7 +41,7 @@ export const JobCard: React.FC<JobCardProps> = ({
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 p-1">
             <img
-              src={job.companyLogo}
+              src={mediaUrl(job.companyLogo)}
               alt={`${job.company} logo`}
               className="w-9 h-9 object-contain"
             />
