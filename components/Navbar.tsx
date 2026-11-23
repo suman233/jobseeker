@@ -17,6 +17,9 @@ import {
   Menu,
   X,
   Briefcase,
+  Building2,
+  TrendingUp,
+  CheckCircle2,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -24,7 +27,7 @@ interface NavbarProps {
   savedCount?: number;
   onOpenSearch?: () => void;
   onOpenSaved?: () => void;
-  onOpenAuth?: () => void;
+  onOpenAuth?: (mode?: "login" | "register") => void;
   onLogout?: () => void;
 }
 
@@ -57,8 +60,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
-      <div className="max-w-[1280px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        {/* Brand Logo & Navigation */}
+      <div className="max-w-[1280px] mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Brand Logo & Desktop Navigation */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
@@ -85,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab("applied-tracker")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab === "applied-tracker"
                   ? "bg-indigo-50 text-indigo-700"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -96,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab("companies")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab === "companies"
                   ? "bg-indigo-50 text-indigo-700"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -107,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab("salary-guide")}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 activeTab === "salary-guide"
                   ? "bg-indigo-50 text-indigo-700"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -119,8 +122,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Actions Toolbar */}
-        <div className="flex items-center gap-3">
-          {/* Quick Search Bar Trigger */}
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Quick Search Bar Trigger (desktop/tablet only) */}
           <button
             type="button"
             onClick={onOpenSearch}
@@ -136,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Action Icon Buttons */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1">
             <button
               type="button"
               aria-label="Saved Jobs"
@@ -154,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               aria-label="Notifications"
-              className="relative p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="hidden sm:inline-flex relative p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <Bell size={19} />
               {showNotificationBadge && (
@@ -163,14 +166,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          <div className="h-6 w-px bg-gray-200 mx-1"></div>
+          <div className="hidden sm:block h-6 w-px bg-gray-200 mx-1"></div>
 
-          {/* User Profile Chip or Login/Register */}
+          {/* User Profile Chip or Login/Register (Visible on tablet/desktop, wrapped cleanly) */}
           <div className="relative">
             {user ? (
               <div
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2.5 p-1 pr-3 rounded-full hover:bg-gray-100 transition-colors cursor-pointer select-none border border-transparent hover:border-gray-200"
+                className="flex items-center gap-2 p-1 pr-1 sm:pr-3 rounded-full hover:bg-gray-100 transition-colors cursor-pointer select-none border border-transparent hover:border-gray-200"
               >
                 <img
                   alt={`${user.name} Avatar`}
@@ -198,17 +201,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <ChevronDown size={14} className="text-gray-400 hidden sm:block" />
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/auth/login"
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                >
-                  Sign In
-                </Link>
+              <div className="hidden sm:flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={onOpenAuth}
-                  className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                  onClick={() => onOpenAuth?.("login")}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onOpenAuth?.("register")}
+                  className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer whitespace-nowrap"
                 >
                   <LogIn size={14} />
                   <span>Register</span>
@@ -216,7 +220,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Profile Menu Dropdown */}
+            {/* Profile Menu Dropdown (Desktop) */}
             {user && showUserMenu && (
               <div className="absolute right-0 top-12 w-56 rounded-xl bg-white shadow-lg border border-gray-100 p-1.5 z-50">
                 <div className="p-2.5 border-b border-gray-100">
@@ -252,59 +256,218 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Mobile Menu Toggle Button (Visible on screens < lg) */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 cursor-pointer"
-            aria-label="Toggle navigation"
+            className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:scale-95 transition-all cursor-pointer focus:outline-none"
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2">
-          <Link
-            href="/"
+        <>
+          {/* Backdrop Overlay */}
+          <div
+            className="fixed inset-0 top-16 bg-gray-900/40 backdrop-blur-xs z-40 lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Find Jobs
-          </Link>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("applied-tracker");
-              setMobileMenuOpen(false);
-            }}
-            className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Applied Tracker
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("companies");
-              setMobileMenuOpen(false);
-            }}
-            className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Companies
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("salary-guide");
-              setMobileMenuOpen(false);
-            }}
-            className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Salary Guide
-          </button>
-        </div>
+          />
+
+          {/* Drawer Menu Panel */}
+          <div className="fixed top-16 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-2xl lg:hidden max-h-[calc(100vh-4rem)] overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="p-4 space-y-4 max-w-lg mx-auto">
+              {/* User Account / Auth Actions */}
+              {user ? (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-gray-200/70">
+                  <div className="flex items-center gap-3">
+                    <img
+                      alt={`${user.name} Avatar`}
+                      src={
+                        mediaUrl(user.image, "user") ||
+                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80"
+                      }
+                      className="w-11 h-11 rounded-full object-cover border border-gray-200 shadow-2xs"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80";
+                      }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200">
+                        Verified Candidate
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200/80 flex items-center justify-between gap-2">
+                    <Link
+                      href="/dashboard/my-profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 py-2 px-3 rounded-xl bg-white border border-gray-200 text-center text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-2xs"
+                    >
+                      My Profile
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="py-2 px-3.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
+                    Candidate Access
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAuth?.("login");
+                      }}
+                      className="w-full py-2.5 px-4 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 active:scale-[0.98] text-gray-800 text-sm font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                    >
+                      <User size={16} className="text-gray-600" />
+                      <span>Sign In</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAuth?.("register");
+                      }}
+                      className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white text-sm font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    >
+                      <LogIn size={16} />
+                      <span>Register</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Quick Search Bar Trigger */}
+              {onOpenSearch && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenSearch();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 text-xs font-medium cursor-pointer transition-colors"
+                >
+                  <Search size={16} className="text-gray-400" />
+                  <span className="flex-1 text-left">Search roles, tech, location...</span>
+                </button>
+              )}
+
+              {/* Navigation Links */}
+              <div className="space-y-1 pt-1 border-t border-gray-100">
+                <p className="px-1 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  Explore Careers
+                </p>
+                <Link
+                  href="/"
+                  onClick={() => {
+                    setActiveTab("find-jobs");
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                    activeTab === "find-jobs" && pathname === "/"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Briefcase size={18} className={activeTab === "find-jobs" ? "text-indigo-600" : "text-gray-400"} />
+                  <span>Find Jobs</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("applied-tracker");
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                    activeTab === "applied-tracker"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <CheckCircle2 size={18} className={activeTab === "applied-tracker" ? "text-indigo-600" : "text-gray-400"} />
+                  <span>Applied Tracker</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("companies");
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                    activeTab === "companies"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Building2 size={18} className={activeTab === "companies" ? "text-indigo-600" : "text-gray-400"} />
+                  <span>Companies</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab("salary-guide");
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+                    activeTab === "salary-guide"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <TrendingUp size={18} className={activeTab === "salary-guide" ? "text-indigo-600" : "text-gray-400"} />
+                  <span>Salary Guide</span>
+                </button>
+              </div>
+
+              {/* Mobile Quick Action Items */}
+              <div className="space-y-1 pt-2 border-t border-gray-100">
+                <p className="px-1 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  Quick Access
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenSaved?.();
+                  }}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bookmark size={18} className="text-gray-400" />
+                    <span>Saved Opportunities</span>
+                  </div>
+                  {savedCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">
+                      {savedCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </header>
   );

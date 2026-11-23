@@ -18,6 +18,7 @@ import { CheckCircle2, X } from "lucide-react";
 export default function Home() {
   const { user: currentUser, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
   const [authBannerMsg, setAuthBannerMsg] = useState("");
 
   // Search & Filter State - starts completely EMPTY as requested
@@ -218,6 +219,7 @@ export default function Home() {
     if (!currentUser) {
       setJobToApply(job);
       setAuthBannerMsg("Please sign in to apply for this position.");
+      setAuthModalMode("login");
       setIsAuthModalOpen(true);
       return;
     }
@@ -229,6 +231,7 @@ export default function Home() {
     if (!currentUser) {
       setJobToApply(job);
       setAuthBannerMsg("Please sign in to apply for this position.");
+      setAuthModalMode("login");
       setIsAuthModalOpen(true);
       return;
     }
@@ -294,7 +297,10 @@ export default function Home() {
             locationQuery: "",
           }));
         }}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAuth={(mode) => {
+          setAuthModalMode(mode || "login");
+          setIsAuthModalOpen(true);
+        }}
         onLogout={logout}
       />
 
@@ -404,7 +410,7 @@ export default function Home() {
       {/* Unified Auth Modal (Sign In / Register / Verify OTP) */}
       <AuthModal
         isOpen={isAuthModalOpen}
-        initialMode="login"
+        initialMode={authModalMode}
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={handleAuthSuccess}
       />
