@@ -9,6 +9,7 @@ interface JobCardProps {
   job: JobItem;
   isSelected: boolean;
   isSaved: boolean;
+  isEmployer?: boolean;
   onSelect: (id: number | string) => void;
   onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onQuickApply: (job: JobItem, e: React.MouseEvent) => void;
@@ -18,6 +19,7 @@ export const JobCard: React.FC<JobCardProps> = ({
   job,
   isSelected,
   isSaved,
+  isEmployer = false,
   onSelect,
   onToggleSave,
   onQuickApply,
@@ -112,7 +114,7 @@ export const JobCard: React.FC<JobCardProps> = ({
           </span>
         </div>
 
-        {job.statusType === "quickApply" ? (
+        {!isEmployer && job.statusType === "quickApply" ? (
           <button
             type="button"
             onClick={(e) => onQuickApply(job, e)}
@@ -121,7 +123,7 @@ export const JobCard: React.FC<JobCardProps> = ({
             <Zap size={13} className="fill-current" />
             <span>Quick Apply</span>
           </button>
-        ) : job.statusType === "applicants" ? (
+        ) : job.statusType === "applicants" || (isEmployer && job.statusType === "quickApply") ? (
           <span className="text-xs text-gray-500 flex items-center gap-1 font-medium">
             <Users size={13} />
             <span>{job.applicantsCount || 12} Applicants</span>

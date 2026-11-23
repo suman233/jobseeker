@@ -67,9 +67,29 @@ export interface JobFilterState {
 
 export interface ApplicationSubmission {
   jobId: number | string;
+  jobTitle?: string;
+  company?: string;
+  applicantName?: string;
+  applicantEmail?: string;
+  resumeFileName?: string;
+  note?: string;
+}
+
+export interface JobApplication {
+  _id: string;
+  job: JobItem | string;
+  user?: string;
+  applicantName: string;
+  applicantEmail: string;
   jobTitle: string;
   company: string;
-  resumeFileName: string;
-  note: string;
+  companyLogo?: string;
+  location?: string;
+  salaryRange?: string;
+  jobType?: string;
+  note?: string;
+  status: "Submitted" | "Under Review" | "Interviewing" | "Offer" | "Rejected";
+  appliedAt: string;
+  createdAt?: string;
 }
 

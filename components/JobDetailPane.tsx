@@ -18,6 +18,7 @@ interface JobDetailPaneProps {
   job: JobItem | null;
   isSaved: boolean;
   isLoading?: boolean;
+  isEmployer?: boolean;
   onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onApplyClick: (job: JobItem) => void;
   onShareClick?: (job: JobItem) => void;
@@ -27,6 +28,7 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
   job,
   isSaved,
   isLoading = false,
+  isEmployer = false,
   onToggleSave,
   onApplyClick,
   onShareClick,
@@ -190,16 +192,22 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
               </span>
             </div>
           </div>
-          <div>
-            <button
-              type="button"
-              onClick={() => onApplyClick(job)}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-            >
-              <Zap size={16} className="fill-current" />
-              <span>Apply Now</span>
-            </button>
-          </div>
+          {isEmployer ? (
+            <div className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 border border-slate-200 select-none">
+              <span>Employer Account (Viewing Only)</span>
+            </div>
+          ) : (
+            <div>
+              <button
+                type="button"
+                onClick={() => onApplyClick(job)}
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white rounded-xl text-sm font-semibold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              >
+                <Zap size={16} className="fill-current" />
+                <span>Apply Now</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -10,13 +10,14 @@ import ApplyModal from "@/components/ApplyModal";
 import AuthModal from "@/components/AuthModal";
 import { INITIAL_JOBS } from "@/lib/jobData";
 import { JobItem, JobFilterState } from "@/typescript/interface/job.interface";
-import { fetchJobsApi } from "@/api/functions/job.api";
+import { fetchJobsApi, submitJobApplicationApi } from "@/api/functions/job.api";
 import { UserProfile } from "@/api/functions/user.api";
 import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, X } from "lucide-react";
 
 export default function Home() {
-  const { user: currentUser, logout } = useAuth();
+  const { user: currentUser, token, logout } = useAuth();
+  const isEmployer = currentUser?.role === "employer";
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
   const [authBannerMsg, setAuthBannerMsg] = useState("");
@@ -216,6 +217,11 @@ export default function Home() {
   // Trigger 1-Click Fast Apply modal (Requires Authentication)
   const handleQuickApply = (job: JobItem, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isEmployer) {
+      setAuthBannerMsg("Employer accounts cannot apply to jobs. Switch to a candidate account.");
+      setTimeout(() => setAuthBannerMsg(""), 5000);
+      return;
+    }
     if (!currentUser) {
       setJobToApply(job);
       setAuthBannerMsg("Please sign in to apply for this position.");
@@ -228,6 +234,11 @@ export default function Home() {
   };
 
   const handleApplyNow = (job: JobItem) => {
+    if (isEmployer) {
+      setAuthBannerMsg("Employer accounts cannot apply to jobs. Switch to a candidate account.");
+      setTimeout(() => setAuthBannerMsg(""), 5000);
+      return;
+    }
     if (!currentUser) {
       setJobToApply(job);
       setAuthBannerMsg("Please sign in to apply for this position.");
@@ -240,14 +251,27 @@ export default function Home() {
   };
 
   // Application submission callback
-  const handleConfirmApplication = (job: JobItem, note: string) => {
-    console.log("Application submitted:", {
-      jobId: job.id,
-      title: job.title,
-      company: job.company,
-      applicant: currentUser ? currentUser.email : "Anonymous Candidate",
-      note,
-    });
+  const handleConfirmApplication = async (job: JobItem, note: string) => {
+    try {
+      const res = await submitJobApplicationApi(
+        {
+          jobId: job.id,
+          jobTitle: job.title,
+          company: job.company,
+          applicantName: currentUser?.name || "Candidate",
+          applicantEmail: currentUser?.email || "",
+          note,
+        },
+        token || undefined
+      );
+      setAuthBannerMsg(
+        res.message || `Application for ${job.title} at ${job.company} submitted successfully!`
+      );
+      setTimeout(() => setAuthBannerMsg(""), 6000);
+    } catch (err: any) {
+      setAuthBannerMsg(err?.message || "Failed to submit application.");
+      setTimeout(() => setAuthBannerMsg(""), 6000);
+    }
   };
 
   // Handle successful Auth
@@ -341,6 +365,7 @@ export default function Home() {
               currentPage={currentPage}
               totalPages={totalPages}
               isLoading={isLoading}
+              isEmployer={isEmployer}
               onSelectJob={handleSelectJob}
               onToggleSave={handleToggleSave}
               onQuickApply={handleQuickApply}
@@ -355,6 +380,7 @@ export default function Home() {
               job={activeJob}
               isSaved={activeJob ? savedJobIds.has(activeJob.id) : false}
               isLoading={isLoading}
+              isEmployer={isEmployer}
               onToggleSave={handleToggleSave}
               onApplyClick={handleApplyNow}
               onShareClick={handleShare}
@@ -383,6 +409,7 @@ export default function Home() {
                   job={activeJob}
                   isSaved={savedJobIds.has(activeJob.id)}
                   isLoading={isLoading}
+                  isEmployer={isEmployer}
                   onToggleSave={handleToggleSave}
                   onApplyClick={(job) => {
                     setMobileDetailOpen(false);

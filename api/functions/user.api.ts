@@ -30,6 +30,11 @@ export interface UserProfile {
   email: string;
   role: string;
   image?: string;
+  phone?: string;
+  headline?: string;
+  location?: string;
+  bio?: string;
+  skills?: string[];
   isEmailVerified?: boolean;
   frontendUser?: boolean;
   createdAt?: string;
@@ -97,6 +102,25 @@ export const fetchUserProfileApi = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    }
+  );
+};
+
+// Update candidate/user profile API
+export const updateUserProfileApi = async (
+  payload: FormData | Partial<UserProfile>,
+  token?: string
+): Promise<UserResponse> => {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return axiosInstance.post<UserResponse>(
+    ENDPOINTS.auth.updateProfile,
+    payload,
+    {
+      headers,
     }
   );
 };

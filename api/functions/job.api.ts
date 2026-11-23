@@ -5,6 +5,7 @@ import {
   JobItem,
   JobFilterState,
   ApplicationSubmission,
+  JobApplication,
 } from "@/typescript/interface/job.interface";
 import { INITIAL_JOBS } from "@/lib/jobData";
 import { APP_CONFIG } from "@/config/constants";
@@ -260,19 +261,59 @@ export const fetchJobDetailApi = async (
 
 // Submit 1-Click Fast Application
 export const submitJobApplicationApi = async (
-  submission: ApplicationSubmission
+  submission: ApplicationSubmission,
+  token?: string
 ): Promise<ApplicationResponse> => {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   try {
     const res = await axiosInstance.post<ApplicationResponse>(
       ENDPOINTS.jobs.apply,
-      submission
+      submission,
+      { headers }
     );
     return res;
-  } catch {
+  } catch (err: any) {
+    if (err?.response?.data?.message) {
+      throw new Error(err.response.data.message);
+    }
     return {
       status: true,
       message: "Application submitted successfully via WorkSphere Fast Pass.",
       applicationId: `APP-${Date.now()}`,
+    };
+  }
+};
+
+// Fetch User Applied Jobs API
+export const fetchUserApplicationsApi = async (
+  userId?: string,
+  token?: string
+): Promise<{ status: boolean; count: number; data: JobApplication[] }> => {
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const query = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+  const endpoint = `${ENDPOINTS.jobs.userApplications}${query}`;
+
+  try {
+    const res = await axiosInstance.get<{
+      status: boolean;
+      count: number;
+      data: JobApplication[];
+    }>(endpoint, { headers });
+    return res;
+  } catch (err) {
+    console.warn("Could not fetch user applications:", err);
+    return {
+      status: false,
+      count: 0,
+      data: [],
     };
   }
 };

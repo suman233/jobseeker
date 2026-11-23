@@ -50,10 +50,12 @@ export const fetcher = async <T = unknown>(
   options: RequestInit = {}
 ): Promise<T> => {
   const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`;
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+  const defaultHeaders: Record<string, string> = isFormData ? {} : { "Content-Type": "application/json" };
   const response = await fetch(url, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...defaultHeaders,
       ...options.headers,
     },
     credentials: "include",
@@ -72,18 +74,22 @@ export const fetcher = async <T = unknown>(
 export const axiosInstance = {
   get: <T = unknown>(url: string, init?: RequestInit) =>
     fetcher<T>(url, { method: "GET", ...init }),
-  post: <T = unknown>(url: string, data?: unknown, init?: RequestInit) =>
-    fetcher<T>(url, {
+  post: <T = unknown>(url: string, data?: unknown, init?: RequestInit) => {
+    const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+    return fetcher<T>(url, {
       method: "POST",
-      body: data !== undefined ? JSON.stringify(data) : undefined,
+      body: isFormData ? data : (data !== undefined ? JSON.stringify(data) : undefined),
       ...init,
-    }),
-  put: <T = unknown>(url: string, data?: unknown, init?: RequestInit) =>
-    fetcher<T>(url, {
+    });
+  },
+  put: <T = unknown>(url: string, data?: unknown, init?: RequestInit) => {
+    const isFormData = typeof FormData !== "undefined" && data instanceof FormData;
+    return fetcher<T>(url, {
       method: "PUT",
-      body: data !== undefined ? JSON.stringify(data) : undefined,
+      body: isFormData ? data : (data !== undefined ? JSON.stringify(data) : undefined),
       ...init,
-    }),
+    });
+  },
   delete: <T = unknown>(url: string, init?: RequestInit) =>
     fetcher<T>(url, { method: "DELETE", ...init }),
 };

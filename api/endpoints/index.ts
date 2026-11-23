@@ -4,6 +4,7 @@ export const ENDPOINTS = {
     login: "/api/user-login",
     register: "/api/user-register",
     profile: "/api/user-profile",
+    updateProfile: "/api/user-profile-update",
     verifyOtp: "/api/verify-otp",
     resendOtp: "/api/resend-otp",
     sendEmailOtp: "/api/send-email-otp",
@@ -13,6 +14,7 @@ export const ENDPOINTS = {
     list: "/api/jobs",
     detail: (id: number | string) => `/api/jobs/${id}`,
     apply: "/api/jobs/apply",
+    userApplications: "/api/user-applications",
   },
   admin: {
     login: "/admin/login",

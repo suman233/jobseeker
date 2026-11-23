@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import EditProfileModal from "@/components/EditProfileModal";
 import { useAuth } from "@/hooks/useAuth";
 import { mediaUrl } from "@/utils/media";
+import { fetchUserApplicationsApi } from "@/api/functions/job.api";
+import { JobApplication } from "@/typescript/interface/job.interface";
 import {
   CheckCircle2,
   Mail,
@@ -20,11 +23,26 @@ import {
   Code2,
   ArrowRight,
   User,
+  Pencil,
+  Briefcase,
+  MapPin,
+  Phone,
+  Building2,
+  Clock,
+  Sparkles,
+  ExternalLink,
+  X,
 } from "lucide-react";
 
 export default function MyProfilePage() {
   const router = useRouter();
-  const { user, isLoggedIn, isLoading, logout, refreshProfile } = useAuth();
+  const { user, token, isLoggedIn, isLoading, logout, refreshProfile, updateUser } =
+    useAuth();
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [appliedJobs, setAppliedJobs] = useState<JobApplication[]>([]);
+  const [isLoadingApps, setIsLoadingApps] = useState(true);
+  const [profileBanner, setProfileBanner] = useState("");
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -37,6 +55,19 @@ export default function MyProfilePage() {
       refreshProfile();
     }
   }, [isLoggedIn, refreshProfile]);
+
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      setIsLoadingApps(true);
+      fetchUserApplicationsApi(user._id, token || undefined)
+        .then((res) => {
+          if (res.status && Array.isArray(res.data)) {
+            setAppliedJobs(res.data);
+          }
+        })
+        .finally(() => setIsLoadingApps(false));
+    }
+  }, [isLoggedIn, user?._id, token]);
 
   if (isLoading || !user) {
     return (
@@ -104,7 +135,15 @@ export default function MyProfilePage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="flex items-center gap-2 self-start md:self-end">
+            <div className="flex flex-wrap items-center gap-2 self-start md:self-end">
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-800 text-xs font-bold hover:bg-gray-50 active:scale-[0.98] transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              >
+                <Pencil size={14} className="text-indigo-600" />
+                <span>Edit Profile</span>
+              </button>
               <Link
                 href="/"
                 className="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-all flex items-center gap-1.5 shadow-sm"
@@ -127,16 +166,35 @@ export default function MyProfilePage() {
           </div>
         </div>
 
+        {/* Notification Banner */}
+        {profileBanner && (
+          <div className="mb-4 bg-emerald-50 text-emerald-800 px-4 py-2.5 rounded-xl border border-emerald-300 flex items-center justify-between text-xs font-semibold shadow-2xs">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <span>{profileBanner}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setProfileBanner("")}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         {/* Dashboard Grid Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs">
             <span className="text-xs text-gray-500 font-medium">
               Applications Sent
             </span>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">12</p>
+            <p className="text-2xl font-bold text-indigo-600 mt-1">
+              {appliedJobs.length}
+            </p>
             <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1 mt-1">
               <TrendingUp size={13} />
-              3 in review this week
+              {appliedJobs.length > 0 ? `${appliedJobs.length} active in pipeline` : "Ready to apply"}
             </span>
           </div>
 
@@ -180,12 +238,24 @@ export default function MyProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Candidate Overview Card */}
             <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
-              <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <User size={18} className="text-indigo-600" />
-                Candidate Overview
-              </h2>
-              <div className="space-y-4 text-xs text-gray-600">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <User size={18} className="text-indigo-600" />
+                  Candidate Overview
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <Pencil size={13} />
+                  <span>Edit Details</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-600">
                 <div>
                   <h4 className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">
                     Role Category
@@ -212,39 +282,180 @@ export default function MyProfilePage() {
                     Target Position
                   </h4>
                   <p className="text-gray-900 font-medium">
-                    Senior Software Engineer / Product Designer
+                    {user.headline || "Senior Software Engineer / Product Designer"}
                   </p>
                 </div>
 
                 <div>
                   <h4 className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">
-                    Preferred Work Mode
+                    Location & Work Mode
                   </h4>
                   <p className="text-gray-900 font-medium">
-                    Remote / Hybrid (San Francisco, CA or Worldwide)
+                    {user.location || "Remote / Hybrid (San Francisco, CA or Worldwide)"}
                   </p>
                 </div>
+
+                {user.phone && (
+                  <div>
+                    <h4 className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">
+                      Contact Phone
+                    </h4>
+                    <p className="text-gray-900 font-medium">{user.phone}</p>
+                  </div>
+                )}
               </div>
+
+              {user.bio && (
+                <div className="mt-4 pt-3 border-t border-gray-100 text-xs">
+                  <h4 className="text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    Professional Bio
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">{user.bio}</p>
+                </div>
+              )}
             </div>
 
+            {/* Applied Positions Tracker */}
             <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
-              <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Code2 size={18} className="text-indigo-600" />
-                Core Technical Skills
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Briefcase size={18} className="text-indigo-600" />
+                  <h2 className="text-base font-bold text-gray-900">
+                    My Job Applications
+                  </h2>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                  {appliedJobs.length} {appliedJobs.length === 1 ? "Role" : "Roles"} Applied
+                </span>
+              </div>
+
+              {isLoadingApps ? (
+                <div className="py-8 text-center text-xs text-gray-500">
+                  <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <span>Loading your applications...</span>
+                </div>
+              ) : appliedJobs.length === 0 ? (
+                <div className="py-8 text-center border-2 border-dashed border-gray-200 rounded-xl p-6">
+                  <Briefcase size={28} className="mx-auto text-gray-300 mb-2" />
+                  <h4 className="text-xs font-bold text-gray-700">
+                    No Applications Submitted Yet
+                  </h4>
+                  <p className="text-[11px] text-gray-400 mt-1 max-w-sm mx-auto">
+                    Explore top venture-backed roles on WorkSphere and apply with 1-Click Fast Pass.
+                  </p>
+                  <Link
+                    href="/"
+                    className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition-colors shadow-2xs"
+                  >
+                    <Search size={13} />
+                    <span>Browse Open Positions</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {appliedJobs.map((app) => {
+                    const statusColors = {
+                      Submitted: "bg-blue-50 text-blue-700 border-blue-200",
+                      "Under Review": "bg-amber-50 text-amber-700 border-amber-200",
+                      Interviewing: "bg-purple-50 text-purple-700 border-purple-200",
+                      Offer: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                      Rejected: "bg-gray-100 text-gray-700 border-gray-200",
+                    };
+                    const statusClass =
+                      statusColors[app.status] || "bg-blue-50 text-blue-700 border-blue-200";
+
+                    const appliedDate = app.appliedAt
+                      ? new Date(app.appliedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "Recently";
+
+                    return (
+                      <div
+                        key={app._id}
+                        className="p-3.5 rounded-xl border border-gray-200/80 bg-slate-50/40 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                      >
+                        <div className="flex items-start gap-3 min-w-0">
+                          <img
+                            src={
+                              mediaUrl(app.companyLogo, "job") ||
+                              "https://lh3.googleusercontent.com/aida-public/AB6AXuD4MvwGVVIM-VqfhKpnmmtvThCkCUKgIaW6FHbIR9XriDqIAa4n9dNsx9rLOKcKauAu99VlT8gqFV4agpRCPQvIoP6xtLJqpIznimdPBYfUY4l7-M6kYLUdMyFd1_jB8hUTRnMnbMqdy7UMxBHw7hgoXknRppVbbi8qPAqhVe5_DXKq-y63jNdZg7D0pnYTWXVTuSMxff7NBqgtPhipQnI8RrTfu-QoneneBfOXc9Y"
+                            }
+                            alt={app.company}
+                            className="w-10 h-10 rounded-xl object-contain bg-white border border-gray-200 p-1 shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "https://lh3.googleusercontent.com/aida-public/AB6AXuD4MvwGVVIM-VqfhKpnmmtvThCkCUKgIaW6FHbIR9XriDqIAa4n9dNsx9rLOKcKauAu99VlT8gqFV4agpRCPQvIoP6xtLJqpIznimdPBYfUY4l7-M6kYLUdMyFd1_jB8hUTRnMnbMqdy7UMxBHw7hgoXknRppVbbi8qPAqhVe5_DXKq-y63jNdZg7D0pnYTWXVTuSMxff7NBqgtPhipQnI8RrTfu-QoneneBfOXc9Y";
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-gray-900 truncate">
+                              {app.jobTitle}
+                            </h4>
+                            <p className="text-[11px] text-gray-500 font-medium">
+                              {app.company} • {app.location || "Remote"}
+                            </p>
+                            {app.salaryRange && (
+                              <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">
+                                {app.salaryRange}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-100">
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusClass}`}
+                          >
+                            {app.status}
+                          </span>
+                          <span className="text-[10px] text-gray-400 flex items-center gap-1 font-medium">
+                            <Clock size={11} />
+                            Applied {appliedDate}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Core Skills Card */}
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <Code2 size={18} className="text-indigo-600" />
+                  Core Technical Skills
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 cursor-pointer"
+                >
+                  <Pencil size={13} />
+                  <span>Edit Skills</span>
+                </button>
+              </div>
+
               <div className="flex flex-wrap gap-2 pt-1">
-                {[
-                  "React",
-                  "Next.js",
-                  "TypeScript",
-                  "Node.js",
-                  "Express",
-                  "MongoDB",
-                  "Tailwind CSS",
-                  "GraphQL",
-                  "PostgreSQL",
-                  "System Design",
-                ].map((skill) => (
+                {(user.skills && user.skills.length > 0
+                  ? user.skills
+                  : [
+                      "React",
+                      "Next.js",
+                      "TypeScript",
+                      "Node.js",
+                      "Express",
+                      "MongoDB",
+                      "Tailwind CSS",
+                      "GraphQL",
+                      "PostgreSQL",
+                      "System Design",
+                    ]
+                ).map((skill) => (
                   <span
                     key={skill}
                     className="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold"
@@ -300,6 +511,19 @@ export default function MyProfilePage() {
           </div>
         </div>
       </main>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        user={user}
+        token={token}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={(updated) => {
+          updateUser(updated);
+          setProfileBanner("Profile updated successfully!");
+          setTimeout(() => setProfileBanner(""), 5000);
+        }}
+      />
 
       <Footer />
     </div>
