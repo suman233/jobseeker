@@ -19,6 +19,7 @@ interface JobDetailPaneProps {
   isSaved: boolean;
   isLoading?: boolean;
   isEmployer?: boolean;
+  isApplied?: boolean;
   onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onApplyClick: (job: JobItem) => void;
   onShareClick?: (job: JobItem) => void;
@@ -29,6 +30,7 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
   isSaved,
   isLoading = false,
   isEmployer = false,
+  isApplied = false,
   onToggleSave,
   onApplyClick,
   onShareClick,
@@ -195,6 +197,17 @@ export const JobDetailPane: React.FC<JobDetailPaneProps> = ({
           {isEmployer ? (
             <div className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold flex items-center gap-1.5 border border-slate-200 select-none">
               <span>Employer Account (Viewing Only)</span>
+            </div>
+          ) : isApplied ? (
+            <div>
+              <button
+                type="button"
+                disabled
+                className="px-6 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-xl text-sm font-bold flex items-center gap-1.5 shadow-2xs opacity-95 cursor-not-allowed select-none"
+              >
+                <CheckCircle2 size={16} className="text-emerald-600" />
+                <span>Applied</span>
+              </button>
             </div>
           ) : (
             <div>

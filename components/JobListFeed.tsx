@@ -16,6 +16,7 @@ interface JobListFeedProps {
   totalPages: number;
   isLoading?: boolean;
   isEmployer?: boolean;
+  appliedJobIds?: Set<number | string>;
   onSelectJob: (id: number | string) => void;
   onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onQuickApply: (job: JobItem, e: React.MouseEvent) => void;
@@ -33,6 +34,7 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
   totalPages,
   isLoading = false,
   isEmployer = false,
+  appliedJobIds,
   onSelectJob,
   onToggleSave,
   onQuickApply,
@@ -179,6 +181,11 @@ export const JobListFeed: React.FC<JobListFeedProps> = ({
               isSelected={job.id === selectedJobId}
               isSaved={savedJobIds.has(job.id)}
               isEmployer={isEmployer}
+              isApplied={Boolean(
+                appliedJobIds &&
+                  (appliedJobIds.has(job.id) ||
+                    (job._id && appliedJobIds.has(job._id)))
+              )}
               onSelect={onSelectJob}
               onToggleSave={onToggleSave}
               onQuickApply={onQuickApply}

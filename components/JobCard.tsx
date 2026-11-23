@@ -10,6 +10,7 @@ interface JobCardProps {
   isSelected: boolean;
   isSaved: boolean;
   isEmployer?: boolean;
+  isApplied?: boolean;
   onSelect: (id: number | string) => void;
   onToggleSave: (id: number | string, e: React.MouseEvent) => void;
   onQuickApply: (job: JobItem, e: React.MouseEvent) => void;
@@ -20,6 +21,7 @@ export const JobCard: React.FC<JobCardProps> = ({
   isSelected,
   isSaved,
   isEmployer = false,
+  isApplied = false,
   onSelect,
   onToggleSave,
   onQuickApply,
@@ -114,7 +116,12 @@ export const JobCard: React.FC<JobCardProps> = ({
           </span>
         </div>
 
-        {!isEmployer && job.statusType === "quickApply" ? (
+        {isApplied ? (
+          <span className="text-xs text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 border border-emerald-200 select-none shadow-2xs">
+            <CheckCircle2 size={13} className="text-emerald-600" />
+            <span>Applied</span>
+          </span>
+        ) : !isEmployer && job.statusType === "quickApply" ? (
           <button
             type="button"
             onClick={(e) => onQuickApply(job, e)}

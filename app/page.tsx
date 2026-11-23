@@ -10,7 +10,11 @@ import ApplyModal from "@/components/ApplyModal";
 import AuthModal from "@/components/AuthModal";
 import { INITIAL_JOBS } from "@/lib/jobData";
 import { JobItem, JobFilterState } from "@/typescript/interface/job.interface";
-import { fetchJobsApi, submitJobApplicationApi } from "@/api/functions/job.api";
+import {
+  fetchJobsApi,
+  submitJobApplicationApi,
+  fetchUserApplicationsApi,
+} from "@/api/functions/job.api";
 import { UserProfile } from "@/api/functions/user.api";
 import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, X } from "lucide-react";
@@ -21,6 +25,7 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("login");
   const [authBannerMsg, setAuthBannerMsg] = useState("");
+  const [appliedJobIds, setAppliedJobIds] = useState<Set<number | string>>(new Set());
 
   // Search & Filter State - starts completely EMPTY as requested
   const [filters, setFilters] = useState<JobFilterState>({
@@ -110,6 +115,40 @@ export default function Home() {
     filters.sortBy,
     loadJobsFromApi,
   ]);
+
+  // Fetch candidate's applied jobs on login/mount
+  useEffect(() => {
+    if (currentUser && token && currentUser.role !== "employer") {
+      fetchUserApplicationsApi(currentUser._id, token).then((res) => {
+        if (res.status && Array.isArray(res.data)) {
+          const ids = new Set<number | string>();
+          res.data.forEach((app) => {
+            if (app.job) {
+              const jId =
+                typeof app.job === "object"
+                  ? app.job.id || (app.job as any)._id
+                  : app.job;
+              if (jId) {
+                ids.add(jId);
+                ids.add(String(jId));
+              }
+            }
+          });
+          setAppliedJobIds(ids);
+        }
+      });
+    } else {
+      setAppliedJobIds(new Set());
+    }
+  }, [currentUser, token]);
+
+  const isJobApplied = useCallback(
+    (jobId: number | string | undefined) => {
+      if (!jobId) return false;
+      return appliedJobIds.has(jobId) || appliedJobIds.has(String(jobId));
+    },
+    [appliedJobIds]
+  );
 
   // Synchronous client-side filter over loaded jobs for instantaneous feedback
   const filteredJobs = useMemo(() => {
@@ -222,6 +261,11 @@ export default function Home() {
       setTimeout(() => setAuthBannerMsg(""), 5000);
       return;
     }
+    if (isJobApplied(job.id) || (job._id && isJobApplied(job._id))) {
+      setAuthBannerMsg("You have already applied for this role. Your application is under review.");
+      setTimeout(() => setAuthBannerMsg(""), 5000);
+      return;
+    }
     if (!currentUser) {
       setJobToApply(job);
       setAuthBannerMsg("Please sign in to apply for this position.");
@@ -236,6 +280,11 @@ export default function Home() {
   const handleApplyNow = (job: JobItem) => {
     if (isEmployer) {
       setAuthBannerMsg("Employer accounts cannot apply to jobs. Switch to a candidate account.");
+      setTimeout(() => setAuthBannerMsg(""), 5000);
+      return;
+    }
+    if (isJobApplied(job.id) || (job._id && isJobApplied(job._id))) {
+      setAuthBannerMsg("You have already applied for this role. Your application is under review.");
       setTimeout(() => setAuthBannerMsg(""), 5000);
       return;
     }
@@ -264,6 +313,16 @@ export default function Home() {
         },
         token || undefined
       );
+      setAppliedJobIds((prev) => {
+        const next = new Set(prev);
+        next.add(job.id);
+        next.add(String(job.id));
+        if (job._id) {
+          next.add(job._id);
+          next.add(String(job._id));
+        }
+        return next;
+      });
       setAuthBannerMsg(
         res.message || `Application for ${job.title} at ${job.company} submitted successfully!`
       );
@@ -361,6 +420,7 @@ export default function Home() {
               totalCount={totalCount}
               selectedJobId={selectedJobId}
               savedJobIds={savedJobIds}
+              appliedJobIds={appliedJobIds}
               sortBy={filters.sortBy}
               currentPage={currentPage}
               totalPages={totalPages}
@@ -381,6 +441,11 @@ export default function Home() {
               isSaved={activeJob ? savedJobIds.has(activeJob.id) : false}
               isLoading={isLoading}
               isEmployer={isEmployer}
+              isApplied={
+                activeJob
+                  ? isJobApplied(activeJob.id) || isJobApplied(activeJob._id)
+                  : false
+              }
               onToggleSave={handleToggleSave}
               onApplyClick={handleApplyNow}
               onShareClick={handleShare}
@@ -410,6 +475,11 @@ export default function Home() {
                   isSaved={savedJobIds.has(activeJob.id)}
                   isLoading={isLoading}
                   isEmployer={isEmployer}
+                  isApplied={
+                    activeJob
+                      ? isJobApplied(activeJob.id) || isJobApplied(activeJob._id)
+                      : false
+                  }
                   onToggleSave={handleToggleSave}
                   onApplyClick={(job) => {
                     setMobileDetailOpen(false);
